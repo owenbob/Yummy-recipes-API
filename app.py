@@ -1,5 +1,8 @@
-from flask import Flask
+from flask import Flask,request,jsonify
 from flask_sqlalchemy import SQLAlchemy
+import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
+
 import jwt 
 
 
@@ -68,37 +71,49 @@ class Recipe(db.Model):
 #-----------------------------------------------ROUTES----------------------------------------------------
 
 #
-@app.route("")
-def 
+@app.route("/register",methods=["Post"])
+def create_user():
+    user_info = request.get_json()
+
+    hashed_password = generate_password_hash(user_info["password"], method="sha256")
+
+    new_user = User(username=user_info["username"], email=user_info["email"], password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message" : "New user created!"})
+
+"""
+@app.route("/registered_users",method=["GET"])
+def get_users():
+    return pass
 
 #
-@app.route("")
-def 
+@app.route("/registered_user/<int:id>" methods=["GET"])
+def get_user():
+    return pass
 
 #
-@app.route("")
-def 
+@app.route("/delete/<int:id>"methods=["DELETE"])
+def delete_user():
+    return pass
 
-#
-@app.route("")
-def 
-
-
-#
-@app.route("")
-def 
+ 
+# #
+# @app.route("")
+# def 
 
 
-#
-@app.route("")
-def 
+# #
+# @app.route("")
+# def 
 
 
-#
-@app.route("")
-def 
+# #
+# @app.route("")
+# def 
 
-
+"""
 
 
 if __name__ == "__main__":
