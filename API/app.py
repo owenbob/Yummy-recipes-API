@@ -1,10 +1,10 @@
-from flask import Flask,request,jsonify
+from flask import Flask,request,jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
-import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
-
 import jwt 
+from functools import wraps
+
 
 
 
@@ -136,41 +136,126 @@ def delete_user(id):
     db.session.commit()
 
     return jsonify({"message" : "The user has been deleted!"})
-     
-@app.route("/login")
+
+#Method to assign token to function
+def token_needed(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if "x-access-token" in request.headers:
+            token = request.headers["x-access-token"]
+
+        if not token:
+            return jsonify({"message" : "1.Token is missing!"}), 401
+
+        try: 
+            data = jwt.decode(token, app.config["SECRET_KEY"])
+            current_user = User.query.filter_by(email=data["email"]).first()
+        except:
+            return jsonify({"message" : "2.Token is invalid!"}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
+  #Route to login and generate token   
+@app.route("/login",methods=["GET"])
 def login():
     auth = request.authorization
 
-    if not auth or not auth.email or not auth.password:
-        return make_response("Could not verify")
+    if not auth or not auth.username or not auth.password:
+        return  make_response("1.Could not verify")
 
-    user = User.query.filter_by(email=auth.email).first()
+    user = User.query.filter_by(username=auth.username).first()
 
     if not user:
-        return make_response("Could not verify")
+        return make_response("2.Could not verify")
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({"id" : user.id, "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config["SECRET_KEY"])
+        
+        token = jwt.encode({"email" : user.email, "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config["SECRET_KEY"])
 
         return jsonify({"token" : token.decode("UTF-8")})
 
-    return make_response("Could not verify")
+    return make_response("1.Could not verify")
+
+
+@app.route("/create_recipe", methods=["POST"])
+@token_needed
+def create_recipe(current_user):
+    data = request.get_json()
+
+    new_recipe = Recipe(recipe_id=data["recipe_id"], title=data["title"],description=data["description"],email=current_user.email)
+    db.session.add(new_recipe)
+    db.session.commit()
+
+    return jsonify({"message" : "Recipe created!"})
+
+
+#Route to get all Recipes
+@app.route("/recipes", methods=["GET"])
+@token_needed
+def get_all_recipes(current_user):
+    recipes = Recipe.query.filter_by(email=current_user.email).all()
+
+    output = []
+
+    for recipe in recipes:
+        recipe_data = {}
+        recipe_data["recipe_id"] = recipe.recipe_id
+        recipe_data["title"] = recipe.title
+        recipe_data["description"] = recipe.description
+        output.append(recipe_data)
+
+    return jsonify({"Recipes" : output})
+
+
+
+@app.route("/recipe/<int:recipe_id>", methods=["GET"])
+@token_needed
+def get_one_recipe(current_user, recipe_id):
+    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+
+    if not recipe:
+        return jsonify({"message" : "No Recipe found!"})
+#recipe_id, title, description
+    recipe_data = {}
+    recipe_data["recipe_id"] = recipe.recipe_id
+    recipe_data["title"] = recipe.title
+    recipe_data["description"] = recipe.description
+
+    return jsonify(recipe_data)
+
+
 
 """
-# #
-# @app.route("")
-# def 
+@app.route("/todo/<todo_id>", methods=["PUT"])
+@token_needed
+def complete_todo(current_user, todo_id):
+    todo = Todo.query.filter_by(id=todo_id, user_id=current_user.id).first()
 
+    if not todo:
+        return jsonify({"message" : "No todo found!"})
 
-# #
-# @app.route("")
-# def 
+    todo.complete = True
+    db.session.commit()
 
+    return jsonify({"message" : "Todo item has been completed!"})
 
-# #
-# @app.route("")
-# def 
+@app.route("/todo/<todo_id>", methods=["DELETE"])
+@token_needed
+def delete_todo(current_user, todo_id):
+    todo = Todo.query.filter_by(id=todo_id, user_id=current_user.id).first()
 
+    if not todo:
+        return jsonify({"message" : "No todo found!"})
+
+    db.session.delete(todo)
+    db.session.commit()
+
+    return jsonify({"message" : "Todo item deleted!"})
 """
 #-----------------------------------------RUNNING APP-----------------------------------------------------
 

@@ -36,14 +36,23 @@ class Authorization(BaseTestCase):
         response = self.client.post("/register",data=json.dumps(self.user),headers={"Content-Type":"application/json"})
         assert response.status=="200 OK"
 
+    def test_post_login_endpoint(self):
+        #Testing the register end point
+        #If the method is a POST Method Should  be allowed and receive a positive status code
+        #user = json.dumps({"username":"Jonas","email":"jonas123@gmail.com","password":"*****"})
+        response = self.client.post("/login")
+        assert response.status=="405 METHOD NOT ALLOWED"
 
+    def test_put_login_endpoint(self):
+        #Testing the register end point
+        #If the method is a POST Method Should  be allowed and receive a positive status code
+        #user = json.dumps({"username":"Jonas","email":"jonas123@gmail.com","password":"*****"})
+        response = self.client.put("/login")
+        assert response.status=="405 METHOD NOT ALLOWED"
 
-
-
-
-        #  response = self.app.post(
-        #         "/auth/register",
-        #         content_type="application/json",
-        #         data=json.dumps({"username": self.fakes.user_name(), "password": self.fakes.password()})
-        #         )
-        #     self.assertEqual(response.status_code, 201)
+    def test_delete_login_endpoint(self):
+        #Testing the register end point
+        #If the method is a POST Method Should  be allowed and receive a positive status code
+        #user = json.dumps({"username":"Jonas","email":"jonas123@gmail.com","password":"*****"})
+        response = self.client.delete("/login")
+        assert response.status=="405 METHOD NOT ALLOWED"
