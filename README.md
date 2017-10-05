@@ -2,7 +2,7 @@
 
 ##  Its a RESTful API using Flask with Endpoints that:
    * Enable users to register, login and manage their accounts
-   ```
+    ```
     | Sample EndPoint      | Public Access |
     | -------------------- |:-------------:| 
     | POST /auth/register  | TRUE          | 
