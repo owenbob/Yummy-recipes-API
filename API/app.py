@@ -212,8 +212,8 @@ def get_all_recipes(current_user):
     return jsonify({"Recipes" : output})
 
 
-"""
-@app.route("/recipe/<int:recipe_id>", methods=["GET"])
+
+@app.route("/recipe/<recipe_id>", methods=["GET"])
 @token_needed
 def get_one_recipe(current_user, recipe_id):
     recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
@@ -231,30 +231,30 @@ def get_one_recipe(current_user, recipe_id):
 
 @app.route("/edit_recipe/<recipe_id>", methods=["PUT"])
 @token_needed
-def complete_todo(current_user, recipe_id):
-    recipe = Recipe.query.filter_by(recipe_id=recipe_id_id, email=current_user.email).first()
+def complete_recipe(current_user, recipe_id):
+    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
 
-    if not todo:
+    if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
 
    
     db.session.commit()
 
-    return jsonify({"message" : "Recipe item has been edited!"})
+    return jsonify({"message" : "Recipe has been edited!"})
 
-@app.route("/delte_recipe/<recipe_id>", methods=["DELETE"])
+@app.route("/delete_recipe/<recipe_id>", methods=["DELETE"])
 @token_needed
-def delete_recipe(current_user, todo_id):
-    todo = Todo.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+def delete_recipe(current_user, recipe_id):
+    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
 
-    if not todo:
+    if not recipe:
         return jsonify({"message" : "No Recipe found!"})
 
     db.session.delete(recipe)
     db.session.commit()
 
     return jsonify({"message" : "Recipe deleted!"})
-"""
+
 #-----------------------------------------RUNNING APP-----------------------------------------------------
 
 if __name__ == "__main__":
