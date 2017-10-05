@@ -27,7 +27,6 @@ class Authorization(BaseTestCase):
     def test_post_at_register_endpoint(self):
         #Testing the register end point
         #If the method is a POST Method Should  be allowed and receive a positive status code
-        #user = json.dumps({"username":"Jonas","email":"jonas123@gmail.com","password":"*****"})
         response = self.client.post("/register")
         assert response.status=="400 BAD REQUEST"
 
