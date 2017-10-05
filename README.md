@@ -1,3 +1,6 @@
+[![Code Climate](https://codeclimate.com/github/owenbob/Yummy-recipes-API/badges/gpa.svg)](https://codeclimate.com/github/owenbob/Yummy-recipes-API)
+
+
 # Yummy-recipes-API
 
 ##  Its a RESTful API using Flask with Endpoints that:
