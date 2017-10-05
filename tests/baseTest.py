@@ -17,18 +17,10 @@ class BaseTestCase(TestCase):
 
         user = User("Judyj", "jackson12334@xample.com", "12345")
         
-        #recipe= Recipe("1","Rolex","Obtain eggs","jackson@xample.com")
 
         db.session.add(user)
         db.session.commit()
 
-        """self.user={"username":"Jackson","password":"123"}
-        response =self.client.post(
-            "/login",data=json.dumps(self.user),headers={"Content-Type":"application/json"}
-        )
-
-        self.token=json.loads(response.get_data())["token"]
-        """
 
     def tearDown(self):
         #db.session.remove()

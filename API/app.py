@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt 
 from functools import wraps
+import uuid
 
 
 
@@ -108,9 +109,9 @@ def get_users():
     
 #Route to obtain an individual user in the databse using their id
 @app.route("/registered_user/<email>" ,methods=["GET"])
-def get_user(id):
+def get_user(email):
     
-    user = User.query.filter_by(id=id).first()
+    user = User.query.filter_by(email=email).first()
 
     if not user:
         return jsonify({"message" : "No user found!"})
@@ -124,9 +125,9 @@ def get_user(id):
  
 
 
-#Route to delete an individual user using their id
+#Route to delete an individual user using their email
 @app.route("/delete_registered_user/<email>",methods=["DELETE"])
-def delete_user(id):
+def delete_user(email):
     user = User.query.filter_by(email=email).first()
 
     if not user:
@@ -161,7 +162,7 @@ def token_needed(f):
 
 
   #Route to login and generate token   
-@app.route("/login"ContentHandler)
+@app.route("/login")
 def login():
     auth = request.authorization
 
@@ -187,7 +188,7 @@ def login():
 def create_recipe(current_user):
     data = request.get_json()
 
-    new_recipe = Recipe(recipe_id=data["recipe_id"], title=data["title"],description=data["description"],email=current_user.email)
+    new_recipe = Recipe(recipe_id=str(uuid.uuid4()), title=data["title"],description=data["description"],email=current_user.email)
     db.session.add(new_recipe)
     db.session.commit()
 
