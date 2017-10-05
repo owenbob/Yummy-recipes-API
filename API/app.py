@@ -161,7 +161,7 @@ def token_needed(f):
 
 
   #Route to login and generate token   
-@app.route("/login",methods=["GET"])
+@app.route("/login"ContentHandler)
 def login():
     auth = request.authorization
 

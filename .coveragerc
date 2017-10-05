@@ -1,0 +1,29 @@
+[run]
+omit = 
+    *_bootlocale.py                 
+    *encodings\cp1252.py 
+    *pycache*
+    *sqlalchemy*
+    *numbers*
+    *decimal*
+    *unittest*
+    *sqlite*
+
+
+[report]
+omit = 
+    *sqlalchemy*
+    *numbers*
+    *decimal*
+    *unittest*
+    *sqlite* 
+
+
+
+[post]
+omit = 
+    *sqlalchemy*
+    *numbers*
+    *decimal*
+    *unittest*
+    *sqlite*

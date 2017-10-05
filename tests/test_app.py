@@ -65,15 +65,15 @@ class Authorization(BaseTestCase):
         response = self.client.get("/login")
         assert response.status=="200 OK"
 
+       
+    # def test_get_at_login_token(self):
+    #     #Testing the register end point
+    #     #If the method is a POST Method Should  be allowed and receive a positive status code
         
-    def test_get_at_login_token(self):
-        #Testing the register end point
-        #If the method is a POST Method Should  be allowed and receive a positive status code
+    #     response = self.client.get("/login",data=json.dumps(self.user),headers={"Content-Type":"application/json"})
+    #     assert response.status=="200 OK"
         
-        response = self.client.get("/login")
-        assert response.status=="200 OK"
-        
-
+    
     #----------------------- CREATE_RECIPE ENDPOINT--------------------------------
 
     def test_post_at_create_recipe_endpoint(self):      
