@@ -5,7 +5,7 @@ python:
  
 # command to install dependencies
 install: 
- - pip install pytest
+ - pip install requirements.txt
  
 # command to run tests
 script: 
