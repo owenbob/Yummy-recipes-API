@@ -176,7 +176,7 @@ def login():
 
     if check_password_hash(user.password, auth.password):
         
-        token = jwt.encode({"email" : user.email, "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config["SECRET_KEY"])
+        token = jwt.encode({"email" : user.email, "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=50)}, app.config["SECRET_KEY"])
 
         return jsonify({"token" : token.decode("UTF-8")})
 
@@ -232,13 +232,14 @@ def get_one_recipe(current_user, recipe_id):
 
 @app.route("/edit_recipe/<recipe_id>", methods=["PUT"])
 @token_needed
-def complete_recipe(current_user, recipe_id):
+def edit_recipe(current_user, recipe_id):
     recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
 
     if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
-
-   
+    data = request.get_json()
+    recipe.description=data['description']
+    #edited_recipe=Recipe(description=data["description"])
     db.session.commit()
 
     return jsonify({"message" : "Recipe has been edited!"})
