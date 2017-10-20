@@ -9,6 +9,7 @@ import uuid
 
 
 
+
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "********"
@@ -17,6 +18,7 @@ app.config["SECRET_KEY"] = "********"
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:admin@localhost:5432/yummy_recipes"
 
 db = SQLAlchemy(app)
+
 
 #-----------------------------------------------SQLALCHEMY MODELS-----------------------------------------------------
 
@@ -238,8 +240,7 @@ def edit_recipe(current_user, recipe_id):
     if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
     data = request.get_json()
-    recipe.description=data['description']
-    #edited_recipe=Recipe(description=data["description"])
+    recipe.description=data["description"]
     db.session.commit()
 
     return jsonify({"message" : "Recipe has been edited!"})
