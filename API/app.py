@@ -71,7 +71,7 @@ class Recipe(db.Model):
 
 
     def __repr__(self):
-        #method for retuning data when querying database
+        #method for returning data when querying database
         return "<Recipe: %s>" % self.title
 
 
@@ -163,19 +163,20 @@ def token_needed(f):
 
 
   #Route to login and generate token   
-@app.route("/login")
+@app.route("/login",methods=["POST","GET"])
 def login():
-    auth = request.authorization
+    #auth = request.authorization
+    auth = request.get_json()
 
-    if not auth or not auth.username or not auth.password:
+    if not auth or not auth["username"] or not auth["password"]:
         return  make_response("1.Could not verify")
 
-    user = User.query.filter_by(username=auth.username).first()
+    user = User.query.filter_by(username=auth["username"]).first()
 
     if not user:
-        return make_response("2.Could not verify")
+        return make_response("2.Could not verify because provided details are not for user")
 
-    if check_password_hash(user.password, auth.password):
+    if check_password_hash(user.password, auth["password"]):
         
         token = jwt.encode({"email" : user.email, "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=50)}, app.config["SECRET_KEY"])
 
@@ -200,18 +201,45 @@ def create_recipe(current_user):
 @app.route("/recipes", methods=["GET"])
 @token_needed
 def get_all_recipes(current_user):
-    recipes = Recipe.query.filter_by(email=current_user.email).all()
-
     output = []
+    search = request.args.get("q")
+    limit = request.args.get('limit', None, type=int)
+    page = request.args.get('page', 1, type=int)
 
-    for recipe in recipes:
-        recipe_data = {}
-        recipe_data["recipe_id"] = recipe.recipe_id
-        recipe_data["title"] = recipe.title
-        recipe_data["description"] = recipe.description
-        output.append(recipe_data)
+    if search:
+        search_recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%'))
+        if search_recipes:
+            for recipe in search_recipes:
+                recipe_data = {}
+                recipe_data["recipe_id"] = recipe.recipe_id
+                recipe_data["title"] = recipe.title
+                recipe_data["description"] = recipe.description
+                output.append(recipe_data)
 
-    return jsonify({"Recipes" : output})
+            return jsonify({"Recipes" : output})
+        
+
+    if limit:
+        paginate_recipes = Recipe.query.filter_by(email=current_user.email).paginate(page, limit, False).items
+        for recipe in paginate_recipes:
+            recipe_data = {}
+            recipe_data["recipe_id"] = recipe.recipe_id
+            recipe_data["title"] = recipe.title
+            recipe_data["description"] = recipe.description
+            output.append(recipe_data)
+
+        return jsonify({"Recipes" : output})
+               
+    else:
+        recipes = Recipe.query.filter_by(email=current_user.email).all()
+        for recipe in recipes:
+            recipe_data = {}
+            recipe_data["recipe_id"] = recipe.recipe_id
+            recipe_data["title"] = recipe.title
+            recipe_data["description"] = recipe.description
+            output.append(recipe_data)
+
+        return jsonify({"Recipes" : output})
 
 
 
