@@ -91,7 +91,7 @@ def create_user():
     return jsonify({"message" : "New user  has been created!"})
 
    
- """   
+"""   
 #Route for obtaining all users in the database
 @app.route("/registered_users",methods=["GET"])
 def get_users():
