@@ -8,7 +8,7 @@ import uuid
 
 class BaseTestCase(TestCase):
     # def create_app(self):
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:admin@localhost:5432/test"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://yummyrecipes:admin@localhost:5432/test"
     #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///memory"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
         # 
@@ -29,21 +29,21 @@ class BaseTestCase(TestCase):
 
         db.session.add(user)
         db.session.commit()
-        """
+        
         recipe_id=str(uuid.uuid4())
         self.recipe ={"rolex","1.Obtain eggs"}
         recipe=Recipe(recipe_id,"rolex","1.Obtain eggs","david@gmail.com")
 
         db.session.add(recipe)
-        db.commit()
+        db.session.commit()
        
 
-        self.user = {"username":"david1","password": "123"}
+        self.user = {"username":"david","password": "123"}
         response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
 
-        self.headers= {"token": token,"Content-Type": "application/json"}
-        """
+        self.headers= dict(token=token)
+        
 
     def tearDown(self):
         db.session.remove()

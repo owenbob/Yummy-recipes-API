@@ -189,6 +189,8 @@ def login():
 @app.route("/create_recipe", methods=["POST"])
 @token_needed
 def create_recipe(current_user):
+    #data = request.get_json(force=True)
+    #print("here")
     data = request.get_json()
 
     new_recipe = Recipe(recipe_id=str(uuid.uuid4()), title=data["title"],description=data["description"],email=current_user.email)
