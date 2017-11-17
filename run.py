@@ -1,5 +1,5 @@
 #-----------------------------------------RUNNING APP-----------------------------------------------------
-from API.app import app
+from API.app import app,db
 
 
 if __name__ == "__main__":
