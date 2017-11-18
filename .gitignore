@@ -106,3 +106,4 @@ venv.bak/
 .__pycache__
 Virtual_Environment/
 .DS_Store 
+.vscode

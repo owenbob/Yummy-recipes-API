@@ -189,9 +189,10 @@ def login():
 @app.route("/create_recipe", methods=["POST"])
 @token_needed
 def create_recipe(current_user):
-    #data = request.get_json(force=True)
-    #print("here")
+    print(current_user.email)
+    print("here")
     data = request.get_json()
+    print(data)
 
     new_recipe = Recipe(recipe_id=str(uuid.uuid4()), title=data["title"],description=data["description"],email=current_user.email)
     db.session.add(new_recipe)
