@@ -31,7 +31,7 @@ class BaseTestCase(TestCase):
         db.session.commit()
         
         recipe_id=str(uuid.uuid4())
-        self.recipe ={"rolex","1.Obtain eggs"}
+        self.recipe ={"title":"rolex", "description":"1.Obtain eggs"}
         recipe=Recipe(recipe_id,"rolex","1.Obtain eggs","david@gmail.com")
 
         db.session.add(recipe)
@@ -42,7 +42,7 @@ class BaseTestCase(TestCase):
         response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
 
-        self.headers= dict(token=token)
+        self.headers= {"x-access-token": token}
         
 
     def tearDown(self):

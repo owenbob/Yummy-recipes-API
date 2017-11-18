@@ -110,7 +110,7 @@ class Authorization(BaseTestCase):
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         print(self.headers)
         print(self.recipe)
-        response = self.client.post("/create_recipe",data=json.dumps(self.recipe),headers = self.headers)
+        response = self.client.post("/create_recipe",headers = self.headers,data=json.dumps(self.recipe))
         assert response.status=="200 OK"
     
     def test_post_at_create_recipe_endpoint_with_poor_spelling(self):      
