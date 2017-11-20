@@ -15,7 +15,6 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "********"
 
 #directing API to databse yummy_recipes
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:admin@localhost:5432/yummy_recipes"
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://yummyrecipes:admin@localhost:5432/yummy_recipes"
 
 db = SQLAlchemy(app)
@@ -50,21 +49,20 @@ class User(db.Model):
         return "<User: %s>" % self.email
 
 
-class Caterory(db.Model):
+class Category(db.Model):
     
     # __table__ = "Category"
 
-    category_id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.String(100), primary_key=True)
     category_title = db.Column(db.String(30))
     category_description = db.Column(db.String(1000))
     email = db.Column(db.String(60))
-    
 
 
 
-    def __init__(self, category_id, category_title, category_description, email):
+    def __init__(self, category_id,category_title, category_description, email):
         #initiliazing recipe class constructor
-        self.category_id=rcategory_id
+        self.category_id=category_id
         self.category_title = category_title
         self.category_description = category_description
         self.email= email
@@ -73,7 +71,7 @@ class Caterory(db.Model):
 
     def __repr__(self):
         #method for returning data when querying database
-        return "<Category: %s>" % self.category.title
+        return "<Category: %s>" % self.category_title
 
     
 
@@ -81,18 +79,18 @@ class Recipe(db.Model):
     
     # __table__ = "Recipes"
 
-    recipe_id = db.Column(db.Integer, primary_key=True)
+    recipe_id = db.Column(db.String(100), primary_key=True,)
     recipe_title = db.Column(db.String(30))
     recipe_description = db.Column(db.String(1000))
-    category_id = db.Column(db.Integer)
+    category_title = db.Column(db.String(30))
     email = db.Column(db.String(60))
     
 
-    def __init__(self, recipe_id, recipe_title, recipe_description, category_id,email):
+    def __init__(self, recipe_id, recipe_title,recipe_description,category_title,email):
         #initiliazing recipe class constructor
-        self.recipe_id=recipe_id
+        self.recipe_id= recipe_id
         self.recipe_title = recipe_title
-        self.recipe_description=recipe_description
+        self.recipe_description= recipe_description
         self.category_id =category_id
         self.email= email
        
@@ -100,7 +98,7 @@ class Recipe(db.Model):
 
     def __repr__(self):
         #method for returning data when querying database
-        return "<Recipe: %s>" % self.recipe.title
+        return "<Recipe: %s>" % self.recipe_title
 
 
 
@@ -109,13 +107,17 @@ class Recipe(db.Model):
 #Route for registering a user.This route takes the users details and assigns them a unique id
 @app.route("/register",methods=["POST"])
 def create_user():
+    if not request.json:
+
+        return jsonify({"message ":"Invalid Data Submitted"})
+
     user_info = request.get_json(force=True)
     if user_info:
         hashed_password = generate_password_hash(user_info["password"], method="sha256")
 
         new_user = User(username=user_info["username"], email=user_info["email"], password=hashed_password)
 
-        #email_already_exists=User.query.filter(user_info["email"]).first()
+        
         email_already_exists = db.session.query(db.exists().where(User.email == user_info["email"])).scalar()
         if email_already_exists:
             return jsonify({"message":"This email has already been used to register"})
@@ -131,8 +133,7 @@ def create_user():
 
         return jsonify({"message" : "New user  has been created!"})
 
-    else :
-        return jsonify({"message":"Please input Your  User infomation"})
+  
 
    
 """   
@@ -227,6 +228,37 @@ def login():
         return jsonify({"token" : token.decode("UTF-8")})
 
     return make_response("1.Could not verify")
+
+#Endpoint to create category
+@app.route("/create_category", methods=["POST"])
+@token_needed
+def create_category(current_user):
+    
+    data = request.get_json()
+
+    new_category = Category(
+        category_id=str(uuid.uuid4()),
+        category_title=data["category_title"],
+        category_description=data["category_description"],
+        email=current_user.email
+    )
+    if data["category_title"]=="" or data["category_description"]== "":
+        return jsonify({"message":"Please ensure that you have input a category title and description"})
+
+    db.session.add(new_category)
+    db.session.commit()
+
+    return jsonify({"message" : "Category created!"})
+
+
+
+
+
+
+
+
+
+"""
 
 
 @app.route("/create_recipe", methods=["POST"])
@@ -329,4 +361,4 @@ def delete_recipe(current_user, recipe_id):
     db.session.commit()
 
     return jsonify({"message" : "Recipe deleted!"})
-
+"""
