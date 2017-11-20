@@ -5,6 +5,7 @@ import datetime
 import jwt 
 from functools import wraps
 import uuid
+from validate_email import validate_email
 
 
 
@@ -48,48 +49,90 @@ class User(db.Model):
         #method to return user information when querying database
         return "<User: %s>" % self.email
 
-    
 
-class Recipe(db.Model):
+class Caterory(db.Model):
     
-    # __table__ = "Recipes"
+    # __table__ = "Category"
 
-    recipe_id = db.Column(db.String(100), primary_key=True)
-    title = db.Column(db.String(30))
-    description = db.Column(db.String(1000))
+    category_id = db.Column(db.Integer, primary_key=True)
+    category_title = db.Column(db.String(30))
+    category_description = db.Column(db.String(1000))
     email = db.Column(db.String(60))
     
 
 
 
-    def __init__(self, recipe_id, title, description, email):
+    def __init__(self, category_id, category_title, category_description, email):
         #initiliazing recipe class constructor
-        self.recipe_id=recipe_id
-        self.title = title
-        self.description=description
+        self.category_id=rcategory_id
+        self.category_title = category_title
+        self.category_description = category_description
         self.email= email
        
 
 
     def __repr__(self):
         #method for returning data when querying database
-        return "<Recipe: %s>" % self.title
+        return "<Category: %s>" % self.category.title
+
+    
+
+class Recipe(db.Model):
+    
+    # __table__ = "Recipes"
+
+    recipe_id = db.Column(db.Integer, primary_key=True)
+    recipe_title = db.Column(db.String(30))
+    recipe_description = db.Column(db.String(1000))
+    category_id = db.Column(db.Integer)
+    email = db.Column(db.String(60))
+    
+
+    def __init__(self, recipe_id, recipe_title, recipe_description, category_id,email):
+        #initiliazing recipe class constructor
+        self.recipe_id=recipe_id
+        self.recipe_title = recipe_title
+        self.recipe_description=recipe_description
+        self.category_id =category_id
+        self.email= email
+       
+
+
+    def __repr__(self):
+        #method for returning data when querying database
+        return "<Recipe: %s>" % self.recipe.title
 
 
 
 #-----------------------------------------------ROUTES/ENDPOINTS----------------------------------------------------
 
 #Route for registering a user.This route takes the users details and assigns them a unique id
-@app.route("/register",methods=["Post"])
+@app.route("/register",methods=["POST"])
 def create_user():
     user_info = request.get_json(force=True)
-    hashed_password = generate_password_hash(user_info["password"], method="sha256")
+    if user_info:
+        hashed_password = generate_password_hash(user_info["password"], method="sha256")
 
-    new_user = User(username=user_info["username"], email=user_info["email"], password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
+        new_user = User(username=user_info["username"], email=user_info["email"], password=hashed_password)
 
-    return jsonify({"message" : "New user  has been created!"})
+        #email_already_exists=User.query.filter(user_info["email"]).first()
+        email_already_exists = db.session.query(db.exists().where(User.email == user_info["email"])).scalar()
+        if email_already_exists:
+            return jsonify({"message":"This email has already been used to register"})
+        
+        if user_info["username"] == "" or user_info["email"]== "" or user_info["password"]== "":
+            return jsonify({"message":"Please ensure you have input all your details"})
+
+        if  not validate_email(user_info["email"]):
+            return jsonify({"message":"Please input correct email"})
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({"message" : "New user  has been created!"})
+
+    else :
+        return jsonify({"message":"Please input Your  User infomation"})
 
    
 """   
@@ -240,7 +283,6 @@ def get_all_recipes(current_user):
             recipe_data["title"] = recipe.title
             recipe_data["description"] = recipe.description
             output.append(recipe_data)
-            print (output)
 
         return jsonify({"Recipes" : output})
 

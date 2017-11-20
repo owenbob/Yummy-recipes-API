@@ -1,14 +1,8 @@
 
 import json
+from API.app import User,Recipe, db, app
 from tests.baseTest import BaseTestCase
-"""
-#Generate authentication token
-        user = {"username": "Owen", "password": "123"}
-        response = self.client.post("/login", data=json.dumps(user),headers={"Content-Type": "application/json"})
-        response_data = json.loads(response.data)
-        token = response_data["token"]
-        self.headers = {"x-access-token": token,"Content-Type": "application/json"}
-"""
+
 
 class Authorization(BaseTestCase):
     
@@ -44,6 +38,7 @@ class Authorization(BaseTestCase):
         #If Data posted through this method,it should allow and have a positce response
         self.user={"username":"Jonas","email":"jonas123@gmail.com","password":"*****"}
         response = self.client.post("/register",data=json.dumps(self.user),headers={"Content-Type":"application/json"})
+        self.assertIn("New user  has been created!",str(response.data))
         assert response.status=="200 OK"
 
     def test_post_register_endpoint_with_poor_spelling(self):
@@ -99,41 +94,42 @@ class Authorization(BaseTestCase):
     #----------------------- CREATE_RECIPE ENDPOINT--------------------------------
 
     def test_post_at_create_recipe_endpoint(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.post("/create_recipe")
         assert response.status=="401 UNAUTHORIZED"
 
 
     def test_post_at_create_recipe_endpoint(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.post("/create_recipe",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
+        self.assertIn("Recipe created!",str(response.data))
         assert response.status=="200 OK"
     
     def test_post_at_create_recipe_endpoint_with_poor_spelling(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.post("/create-recipe")
         assert response.status=="404 NOT FOUND"
 
    
     def test_get_at_create_endpoint_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.get("/create_recipe")
         assert response.status=="405 METHOD NOT ALLOWED"
 
     
     def test_put_at_create_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/create_recipe")
         assert response.status=="405 METHOD NOT ALLOWED"
 
     
     def test_delete_at_create_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/create_recipe")
         assert response.status=="405 METHOD NOT ALLOWED"
@@ -180,7 +176,11 @@ class Authorization(BaseTestCase):
     def test_get_at_recipes_endpoint_with_token(self):
         #Testing the reci[es endpoint
         #If the method is a  get and has a valid token,then we should receive a positive status code
+        response = self.client.post("/create_recipe",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
         response = self.client.get("/recipes",headers= self.headers)
+        
+        self.assertIn("1.Obtain eggs",str(response.data))
+        assert response.status=="200 OK"
         
 
     
@@ -188,7 +188,7 @@ class Authorization(BaseTestCase):
     #-----------------------RECIPE ENDPOINT--------------------------------
     
     def test_post_at_recipe_endpoint(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should not be allowed 
         response = self.client.post("/recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
@@ -196,69 +196,101 @@ class Authorization(BaseTestCase):
     
    
     def test_get_at_recipe_endpoint_(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed but receive unauthorized status
         response = self.client.get("/recipe/<recipe_id>")
         assert response.status=="401 UNAUTHORIZED"
 
     def test_get_at_recipe_endpoint_with_poor_spelling(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed but receive unauthorized status
         response = self.client.get("/Recipe/<recipe_id>")
         assert response.status=="404 NOT FOUND"
 
     
     def test_put_at_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
     
     def test_delete_at_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
+    def test_get_at_recipe_endpoint_with_authorisation(self):
+        #Testing the recipe end point
+        #If the method is a get ,and with proper with authorisation then should have a positive status
+        response = self.client.get("/recipe/<recipe_id>",headers = self.headers, content_type='application/json')
+        assert response.status=="200 OK"
+
+    
+    def test_get_at_recipe_endpoint_with_authorisation_and_wrong_recipe_id(self):
+        #Testing the recipe end point
+        #If the method is a get ,and with proper with authorisation then should have a positive status but a message that recipe is NOT found
+        response = self.client.post("/create_recipe",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
+        
+        response = self.client.get("/recipe/456",headers = self.headers, content_type='application/json')
+        self.assertIn("No Recipe found!",str(response.data))
+        assert response.status=="200 OK"
+
+    """
+    def test_get_at_recipe_endpoint_with_authorisation_and_the_recipe_id(self):
+        #Testing the recipe end point
+        #If the method is a get ,and with proper with authorisation then should have a positive status
+        response = self.client.post("/create_recipe",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
+        
+        response = self.client.get("/recipe/456",headers = self.headers, content_type='application/json')
+        self.assertIn("No Recipe found!",str(response.data))
+        assert response.status=="200 OK"
+    """
+        
+       
+ 
     
     
     
         #----------------------- EDIT RECIPE ENDPOINT--------------------------------
     
     def test_post_at_edit_recipe_endpoint(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should not be allowed 
         response = self.client.post("/edit_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
-    
-   
-
-    
+        
     def test_get_at_edit_recipe_endpoint_(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed but receive unauthorized status
         response = self.client.get("/edit_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
     
     def test_put_at_edit_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/edit_recipe/<recipe_id>")
         assert response.status=="401 UNAUTHORIZED"
 
+    def test_put_at_edit_recipe_endpoint(self):
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        response = self.client.put("/edit_recipe/<recipe_id>",headers = self.headers, content_type='application/json')
+        assert response.status=="200 OK"
+
     
     def test_put_at_edit_recipe_endpoint_with_poor_spelling(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/Edit_recipe/<recipe_id>")
         assert response.status=="404 NOT FOUND"
 
 
     def test_delete_at_edit_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/edit_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
@@ -269,7 +301,7 @@ class Authorization(BaseTestCase):
         #----------------------- DELETE RECIPE ENDPOINT--------------------------------
     
     def test_post_at_delete_recipe_endpoint(self):      
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should not be allowed 
         response = self.client.post("/delete_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
@@ -279,27 +311,33 @@ class Authorization(BaseTestCase):
 
     
     def test_get_at_delete_recipe_endpoint_(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed but receive unauthorized status
         response = self.client.get("/delete_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
     
     def test_put_at_delete_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/delete_recipe/<recipe_id>")
         assert response.status=="405 METHOD NOT ALLOWED"
 
 
     def test_delete_at_delete_recipe_endpoint(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/delete_recipe/<recipe_id>")
         assert response.status=="401 UNAUTHORIZED"
 
+    def test_delete_at_delete_recipe_endpoint(self):
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        response = self.client.delete("/delete_recipe/<recipe_id>",headers = self.headers,content_type='application/json')
+        assert response.status=="200 OK"
+
     def test_delete_at_delete_recipe_endpoint_with_poor_spelling(self):
-        #Testing the create_receipe end point
+        #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/delete_Recipe/<recipe_id>")
         assert response.status=="404 NOT FOUND"
