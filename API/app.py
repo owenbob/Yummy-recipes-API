@@ -336,20 +336,20 @@ def edit_category(current_user, category_id):
 
     return jsonify({"message" : "Category has been edited!"})
 
-"""
-@app.route("/delete_recipe/<recipe_id>", methods=["DELETE"])
+
+@app.route("/delete_category/<category_id>", methods=["DELETE"])
 @token_needed
-def delete_recipe(current_user, recipe_id):
-    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+def delete_category(current_user, category_id):
+    category = Category.query.filter_by(category_id=category_id, email=current_user.email).first()
 
-    if not recipe:
-        return jsonify({"message" : "No Recipe found!"})
+    if not category :
+        return jsonify({"message" : "No Category found!"})
 
-    db.session.delete(recipe)
+    db.session.delete(category)
     db.session.commit()
 
-    return jsonify({"message" : "Recipe deleted!"})
-"""
+    return jsonify({"message" : "Category deleted!"})
+
 
 
 
