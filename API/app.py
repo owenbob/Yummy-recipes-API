@@ -233,6 +233,8 @@ def login():
 @app.route("/create_category", methods=["POST"])
 @token_needed
 def create_category(current_user):
+    if not request.json:
+        return jsonify({"message ":"Invalid Data Submitted"})
     
     data = request.get_json()
 
@@ -251,6 +253,70 @@ def create_category(current_user):
     return jsonify({"message" : "Category created!"})
 
 
+
+
+#Route to get all Recipes
+@app.route("/categories", methods=["GET"])
+@token_needed
+def get_all_categories(current_user):
+    output = []
+    search = request.args.get("q")
+    limit = request.args.get('limit', None, type=int)
+    page = request.args.get('page', 1, type=int)
+
+    if search:
+        search_categories = Category.query.filter(Category.category_title.ilike('%' + search + '%'))
+        if search_categories:
+            for category in search_categories:
+                category_data = {}
+                category_data["category_id"] = category.category_id
+                category_data["category_title"] = category.category_title
+                category_data["category_description"] = category.category_description
+                output.append(category_data)
+
+            return jsonify({"Categories" : output})
+        
+
+    if limit:
+        paginate_categories = Category.query.filter_by(email=current_user.email).paginate(page, limit, False).items
+        for category in paginate_categories:
+            category_data = {}
+            category_data["category_id"] = category.category_id
+            category_data["category_title"] = category.category_title
+            category_data["category_description"] = category.category_description
+            output.append(category_data)
+
+        return jsonify({"Categories" : output})
+               
+    else:
+        categories = Category.query.filter_by(email=current_user.email).all()
+        for category in categories:
+            category_data = {}
+            category_data["category_id"] = category.category_id
+            category_data["category_title"] = category.category_title
+            category_data["category_description"] = category.category_description
+            output.append(category_data)
+
+        return jsonify({"Categories" : output})
+
+
+"""
+@app.route("/recipe/<recipe_id>", methods=["GET"])
+@token_needed
+def get_one_recipe(current_user, recipe_id):
+    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+
+    if not recipe:
+        return jsonify({"message" : "No Recipe found!"})
+#recipe_id, title, description
+    recipe_data = {}
+    recipe_data["recipe_id"] = recipe.recipe_id
+    recipe_data["title"] = recipe.title
+    recipe_data["description"] = recipe.description
+
+    return jsonify(recipe_data)
+
+"""
 
 
 
