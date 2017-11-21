@@ -317,6 +317,41 @@ def get_one_category(current_user, category_id):
     return jsonify(category_data)
 
 
+@app.route("/edit_category/<category_id>", methods=["PUT"])
+@token_needed
+def edit_category(current_user, category_id):
+    category = Category.query.filter_by(category_id=category_id, email=current_user.email).first()
+
+    if not  category:
+        return jsonify({"message" : "No Category found!"})
+    if not request.json:
+        return jsonify({"message ":"Invalid Data Submitted"})
+
+    data = request.get_json()
+    if data["category_description"]== "":
+        return jsonify({"message":"Please ensure that you have input a category description"})
+
+    category.category_description=data["category_description"]
+    db.session.commit()
+
+    return jsonify({"message" : "Category has been edited!"})
+
+"""
+@app.route("/delete_recipe/<recipe_id>", methods=["DELETE"])
+@token_needed
+def delete_recipe(current_user, recipe_id):
+    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+
+    if not recipe:
+        return jsonify({"message" : "No Recipe found!"})
+
+    db.session.delete(recipe)
+    db.session.commit()
+
+    return jsonify({"message" : "Recipe deleted!"})
+"""
+
+
 
 
 
