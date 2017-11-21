@@ -300,23 +300,22 @@ def get_all_categories(current_user):
         return jsonify({"Categories" : output})
 
 
-"""
-@app.route("/recipe/<recipe_id>", methods=["GET"])
+
+@app.route("/category/<category_id>", methods=["GET"])
 @token_needed
-def get_one_recipe(current_user, recipe_id):
-    recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
+def get_one_category(current_user, category_id):
+    category= Category.query.filter_by(category_id=category_id, email=current_user.email).first()
 
-    if not recipe:
-        return jsonify({"message" : "No Recipe found!"})
-#recipe_id, title, description
-    recipe_data = {}
-    recipe_data["recipe_id"] = recipe.recipe_id
-    recipe_data["title"] = recipe.title
-    recipe_data["description"] = recipe.description
+    if not category:
+        return jsonify({"message" : "No Category found!"})
 
-    return jsonify(recipe_data)
+    category_data = {}
+    category_data["category_id"] = category.category_id
+    category_data["category_title"] = category.category_title
+    category_data["category_description"] = category.category_description
 
-"""
+    return jsonify(category_data)
+
 
 
 
