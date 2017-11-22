@@ -360,19 +360,21 @@ def create_recipe(current_user):
     
     data = request.get_json()
 
+
+
+    if data["category_title"] == "" or data["recipe_title"] == "" or data["recipe_description"] == "":
+        return jsonify({"message":"Please ensure that you have input a recipe_title,recipe_description and category title"})
+
+    """Available_category = Category.query.filter_by(category_title = data("category_title")).first()
+    if not Available_category:
+        return({"message":"Category not available"}), 500 """
+
     new_recipe = Recipe(
         recipe_id=str(uuid.uuid4()),
         category_title=data["category_title"],
         recipe_title=data["recipe_title"],
         recipe_description=data["recipe_description"],
         email=current_user.email)
-
-    if data["category_title"] == "" or data["recipe_title"] == "" or data["recipe_description"] == "":
-        return jsonify({"message":"Please ensure that you have input a recipe_title,recipe_description and category title"})
-
-    #Available_category = Category.query.filter_by(category_title = data("category_title")).first()
-    #if not Available_category:
-        #return({"message":"Category not available"}), 500
 
     db.session.add(new_recipe)
     db.session.commit()
@@ -426,7 +428,7 @@ def get_all_recipes(current_user):
 
         return jsonify({"Recipes" : output})
 
-"""
+
 
 @app.route("/recipe/<recipe_id>", methods=["GET"])
 @token_needed
@@ -435,15 +437,16 @@ def get_one_recipe(current_user, recipe_id):
 
     if not recipe:
         return jsonify({"message" : "No Recipe found!"})
-#recipe_id, title, description
+
     recipe_data = {}
     recipe_data["recipe_id"] = recipe.recipe_id
-    recipe_data["title"] = recipe.title
-    recipe_data["description"] = recipe.description
+    recipe_data["recipe_title"] = recipe.recipe_title
+    recipe_data["category_title"] =recipe.category_title
+    recipe_data["recipe_description"] = recipe.recipe_description
 
     return jsonify(recipe_data)
 
-
+"""
 @app.route("/edit_recipe/<recipe_id>", methods=["PUT"])
 @token_needed
 def edit_recipe(current_user, recipe_id):
