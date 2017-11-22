@@ -91,7 +91,7 @@ class Recipe(db.Model):
         self.recipe_id= recipe_id
         self.recipe_title = recipe_title
         self.recipe_description= recipe_description
-        self.category_id =category_id
+        self.category_title =category_title
         self.email= email
        
 
@@ -328,7 +328,7 @@ def edit_category(current_user, category_id):
         return jsonify({"message ":"Invalid Data Submitted"})
 
     data = request.get_json()
-    if data["category_description"]== "":
+    if data["category_description"] == "":
         return jsonify({"message":"Please ensure that you have input a category description"})
 
     category.category_description=data["category_description"]
@@ -352,27 +352,32 @@ def delete_category(current_user, category_id):
 
 
 
-
-
-
-
-
-
-"""
-
-
 @app.route("/create_recipe", methods=["POST"])
 @token_needed
 def create_recipe(current_user):
+    if not request.json:
+        return jsonify({"message ":"Invalid Data Submitted"})
     
     data = request.get_json()
 
-    new_recipe = Recipe(recipe_id=str(uuid.uuid4()), title=data["title"],description=data["description"],email=current_user.email)
+    new_recipe = Recipe(
+        recipe_id=str(uuid.uuid4()),
+        category_title=data["category_title"],
+        recipe_title=data["recipe_title"],
+        recipe_description=data["recipe_description"],
+        email=current_user.email)
+
+    if data["category_title"] == "" or data["recipe_title"] == "" or data["recipe_description"] == "":
+        return jsonify({"message":"Please ensure that you have input a recipe_title,recipe_description and category title"})
+
+    #Available_category = Category.query.filter_by(category_title = data("category_title")).first()
+    #if not Available_category:
+        #return({"message":"Category not available"}), 500
+
     db.session.add(new_recipe)
     db.session.commit()
 
     return jsonify({"message" : "Recipe created!"})
-
 
 #Route to get all Recipes
 @app.route("/recipes", methods=["GET"])
@@ -384,13 +389,14 @@ def get_all_recipes(current_user):
     page = request.args.get('page', 1, type=int)
 
     if search:
-        search_recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%'))
+        search_recipes = Recipe.query.filter(Recipe.recipe_title.ilike('%' + search + '%'))
         if search_recipes:
             for recipe in search_recipes:
                 recipe_data = {}
                 recipe_data["recipe_id"] = recipe.recipe_id
-                recipe_data["title"] = recipe.title
-                recipe_data["description"] = recipe.description
+                recipe_data["recipe_title"] = recipe.recipe_title
+                recipe_data["category_title"] =recipe.category_title
+                recipe_data["recipe_description"] = recipe.recipe_description
                 output.append(recipe_data)
 
             return jsonify({"Recipes" : output})
@@ -401,8 +407,9 @@ def get_all_recipes(current_user):
         for recipe in paginate_recipes:
             recipe_data = {}
             recipe_data["recipe_id"] = recipe.recipe_id
-            recipe_data["title"] = recipe.title
-            recipe_data["description"] = recipe.description
+            recipe_data["recipe_title"] = recipe.recipe_title
+            recipe_data["category_title"] =recipe.category_title
+            recipe_data["recipe_description"] = recipe.recipe_description
             output.append(recipe_data)
 
         return jsonify({"Recipes" : output})
@@ -412,13 +419,14 @@ def get_all_recipes(current_user):
         for recipe in recipes:
             recipe_data = {}
             recipe_data["recipe_id"] = recipe.recipe_id
-            recipe_data["title"] = recipe.title
-            recipe_data["description"] = recipe.description
+            recipe_data["recipe_title"] = recipe.recipe_title
+            recipe_data["category_title"] =recipe.category_title
+            recipe_data["recipe_description"] = recipe.recipe_description
             output.append(recipe_data)
 
         return jsonify({"Recipes" : output})
 
-
+"""
 
 @app.route("/recipe/<recipe_id>", methods=["GET"])
 @token_needed
