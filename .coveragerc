@@ -39,7 +39,10 @@ omit =
     *stringprep.py*
     *typing.py*
     *uuid.py*
-    *pyasn1*        
+    *pyasn1*
+    *smtplib.py*
+    *email/generator.py*
+    *validate_email.py*       
 
 
 [report]
@@ -74,7 +77,10 @@ omit =
     *stringprep.py*
     *typing.py*
     *uuid.py*
-    *pyasn1*       
+    *pyasn1*
+    *smtplib.py*
+    *email/generator.py*
+    *validate_email.py*        
 
 
 
@@ -104,7 +110,10 @@ omit =
     *typing.py*
     *uuid.py*
     *itsdangerous.py*
-    *pyasn1*       
+    *pyasn1*
+    *smtplib.py*
+    *email/generator.py*
+    *validate_email.py*        
          
          
          

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from API.app import User,Recipe, db, app
+from API.app import User,Category,Recipe, db, app
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import json
@@ -9,10 +9,8 @@ import uuid
 class BaseTestCase(TestCase):
     # def create_app(self):
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://yummyrecipes:admin@localhost:5432/test"
-    #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///memory"
+    
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-        # 
-        # return app
     def setUp(self):
         
 
@@ -25,19 +23,26 @@ class BaseTestCase(TestCase):
         self.user = {"david","david@gmail.com",password}
         
         password_hash = generate_password_hash(password, method='sha256')
-        user=User("david","david1@gmail.com",password=password_hash)
+        user=User("david","david@gmail.com",password=password_hash)
 
         db.session.add(user)
         db.session.commit()
+        """
+        self.category={"category_id":"breakfast","category_description":"First meal of the morning"}
+        category=("1","breakfast","First meal of the morning","david@gmail.com")
+
+        db.session.add(category)
+        db.session.commit()
         
-        recipe_id=str(uuid.uuid4())
-        self.recipe ={"title":"rolex", "description":"1.Obtain eggs"}
-        recipe=Recipe(recipe_id,"rolex","1.Obtain eggs","david@gmail.com")
+       
+        #recipe_id=str(uuid.uuid4())
+        self.recipe ={"recipe_title":"rolex", "recipe_description":"1.Obtain eggs"}
+        recipe=Recipe("1","rolex","1","1.Obtain eggs","david@gmail.com")
 
         db.session.add(recipe)
         db.session.commit()
        
-
+        """
         self.user = {"username":"david","password": "123"}
         response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
