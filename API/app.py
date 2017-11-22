@@ -365,9 +365,9 @@ def create_recipe(current_user):
     if data["category_title"] == "" or data["recipe_title"] == "" or data["recipe_description"] == "":
         return jsonify({"message":"Please ensure that you have input a recipe_title,recipe_description and category title"})
 
-    """Available_category = Category.query.filter_by(category_title = data("category_title")).first()
+    Available_category = Category.query.filter_by(category_title = data['category_title']).first()
     if not Available_category:
-        return({"message":"Category not available"}), 500 """
+        return({"message":"Category not available"}), 500 
 
     new_recipe = Recipe(
         recipe_id=str(uuid.uuid4()),
@@ -446,7 +446,7 @@ def get_one_recipe(current_user, recipe_id):
 
     return jsonify(recipe_data)
 
-"""
+
 @app.route("/edit_recipe/<recipe_id>", methods=["PUT"])
 @token_needed
 def edit_recipe(current_user, recipe_id):
@@ -455,7 +455,7 @@ def edit_recipe(current_user, recipe_id):
     if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
     data = request.get_json()
-    recipe.description=data["description"]
+    recipe.recipe_description=data["recipe_description"]
     db.session.commit()
 
     return jsonify({"message" : "Recipe has been edited!"})
@@ -472,4 +472,4 @@ def delete_recipe(current_user, recipe_id):
     db.session.commit()
 
     return jsonify({"message" : "Recipe deleted!"})
-"""
+
