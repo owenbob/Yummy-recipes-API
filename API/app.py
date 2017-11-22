@@ -51,7 +51,7 @@ class User(db.Model):
 
 class Category(db.Model):
     
-    # __table__ = "Category"
+    __tablename__ = "category"
 
     category_id = db.Column(db.String(100), primary_key=True)
     category_title = db.Column(db.String(30))
@@ -77,21 +77,22 @@ class Category(db.Model):
 
 class Recipe(db.Model):
     
-    # __table__ = "Recipes"
+    __tablename__ = "Recipes"
 
     recipe_id = db.Column(db.String(100), primary_key=True,)
     recipe_title = db.Column(db.String(30))
     recipe_description = db.Column(db.String(1000))
-    category_title = db.Column(db.String(30))
+    category_id = db.Column(db.String(100),db.ForeignKey('category.category_id'))
+    category = db.relationship('Category',backref=db.backref('recipe', lazy=True))
     email = db.Column(db.String(60))
     
 
-    def __init__(self, recipe_id, recipe_title,recipe_description,category_title,email):
+    def __init__(self, recipe_id, recipe_title,recipe_description,category_id,email):
         #initiliazing recipe class constructor
         self.recipe_id= recipe_id
         self.recipe_title = recipe_title
         self.recipe_description= recipe_description
-        self.category_title =category_title
+        self.category_id =category_id
         self.email= email
        
 
@@ -352,27 +353,30 @@ def delete_category(current_user, category_id):
 
 
 
-@app.route("/create_recipe", methods=["POST"])
+@app.route("/create_recipe/<category_id>", methods=["POST"])
 @token_needed
-def create_recipe(current_user):
+def create_recipe(current_user,category_id):
+
+    Available_category = Category.query.filter_by(category_id = category_id,email=current_user.email).first()
+    if not  Available_category:
+        return({"message":"Category not available"}), 
     if not request.json:
         return jsonify({"message ":"Invalid Data Submitted"})
     
     data = request.get_json()
 
 
+    if  data["recipe_title"] == "" or data["recipe_description"] == "":
+        return jsonify({
+            "message":"Please ensure that you have input a recipe_title,recipe_description and category title"
+            })
 
-    if data["category_title"] == "" or data["recipe_title"] == "" or data["recipe_description"] == "":
-        return jsonify({"message":"Please ensure that you have input a recipe_title,recipe_description and category title"})
-
-    Available_category = Category.query.filter_by(category_title = data['category_title']).first()
-    if not Available_category:
-        return({"message":"Category not available"}), 500 
+     
 
     new_recipe = Recipe(
         recipe_id=str(uuid.uuid4()),
-        category_title=data["category_title"],
         recipe_title=data["recipe_title"],
+        category_id=category_id,
         recipe_description=data["recipe_description"],
         email=current_user.email)
 
@@ -397,7 +401,7 @@ def get_all_recipes(current_user):
                 recipe_data = {}
                 recipe_data["recipe_id"] = recipe.recipe_id
                 recipe_data["recipe_title"] = recipe.recipe_title
-                recipe_data["category_title"] =recipe.category_title
+                recipe_data["category_id"] =recipe.category_id
                 recipe_data["recipe_description"] = recipe.recipe_description
                 output.append(recipe_data)
 
@@ -410,7 +414,7 @@ def get_all_recipes(current_user):
             recipe_data = {}
             recipe_data["recipe_id"] = recipe.recipe_id
             recipe_data["recipe_title"] = recipe.recipe_title
-            recipe_data["category_title"] =recipe.category_title
+            recipe_data["category_id"] =recipe.category_id
             recipe_data["recipe_description"] = recipe.recipe_description
             output.append(recipe_data)
 
@@ -422,7 +426,7 @@ def get_all_recipes(current_user):
             recipe_data = {}
             recipe_data["recipe_id"] = recipe.recipe_id
             recipe_data["recipe_title"] = recipe.recipe_title
-            recipe_data["category_title"] =recipe.category_title
+            recipe_data["category_id"] =recipe.category_id
             recipe_data["recipe_description"] = recipe.recipe_description
             output.append(recipe_data)
 
@@ -441,7 +445,7 @@ def get_one_recipe(current_user, recipe_id):
     recipe_data = {}
     recipe_data["recipe_id"] = recipe.recipe_id
     recipe_data["recipe_title"] = recipe.recipe_title
-    recipe_data["category_title"] =recipe.category_title
+    recipe_data["category_id"] =recipe.category_id
     recipe_data["recipe_description"] = recipe.recipe_description
 
     return jsonify(recipe_data)
