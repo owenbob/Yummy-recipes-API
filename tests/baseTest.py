@@ -27,22 +27,32 @@ class BaseTestCase(TestCase):
 
         db.session.add(user)
         db.session.commit()
-        """
-        self.category={"category_id":"breakfast","category_description":"First meal of the morning"}
-        category=("1","breakfast","First meal of the morning","david@gmail.com")
+
+        self.invalid_data={}
+
+        
+        self.category = {
+            "category_title":"breakfast",
+            "category_description":"First meal of the morning"
+        }
+        category=Category("1","breakfast","First meal of the morning","david@gmail.com")
 
         db.session.add(category)
         db.session.commit()
+
         
-       
-        #recipe_id=str(uuid.uuid4())
-        self.recipe ={"recipe_title":"rolex", "recipe_description":"1.Obtain eggs"}
-        recipe=Recipe("1","rolex","1","1.Obtain eggs","david@gmail.com")
+        
+        
+        self.recipe ={
+            "recipe_title":"rolex", 
+            "recipe_description":"1.Obtain eggs"
+            }
+        recipe=Recipe("1","rolex","1.Obtain eggs","1","david@gmail.com")
 
         db.session.add(recipe)
         db.session.commit()
        
-        """
+        
         self.user = {"username":"david","password": "123"}
         response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
