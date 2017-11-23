@@ -28,7 +28,10 @@ class BaseTestCase(TestCase):
         db.session.add(user)
         db.session.commit()
 
-        self.invalid_data={}
+        self.invalid_data = {}
+        #self.incomplete_user = {"","david@gmail.com",password}
+        #self.invalid_email_user = {"red","dwrndgmail.com",password}
+        #self.user2 = {"Jackson","david@gmail.com","password"}
 
         
         self.category = {

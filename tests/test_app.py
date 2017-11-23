@@ -41,6 +41,15 @@ class Authorization(BaseTestCase):
         response = self.client.post("/register",data=json.dumps(self.user),headers={"Content-Type":"application/json"})
         self.assertIn("New user  has been created!",str(response.data))
         assert response.status=="200 OK"
+    """
+    def test_post_at_register_user(self):
+        #Testing the register end point
+        #If the method is a POST Method Should  be allowed and receive a positive status code
+        #If Data posted through this method,it should allow and have a positce response
+        response = self.client.post("/register",data=json.dumps(self.invalid_data),headers={"Content-Type":"application/json"})
+        self.assertIn("Invalid Data Submitted",str(response.data))
+        assert response.status=="200 OK"
+
 
     def test_post_at_register_user(self):
         #Testing the register end point
@@ -49,6 +58,16 @@ class Authorization(BaseTestCase):
         response = self.client.post("/register",data=json.dumps(self.invalid_data),headers={"Content-Type":"application/json"})
         self.assertIn("Invalid Data Submitted",str(response.data))
         assert response.status=="200 OK"
+    
+    def test_post_at_register_user(self):
+        #Testing the register end point
+        #If the method is a POST Method Should  be allowed and receive a positive status code
+        #If Data posted through this method,it should allow and have a positce response
+        response = self.client.post("/register",data=json.dumps(self.incomplete_user),headers={"Content-Type":"application/json"})
+        self.assertIn("This email has already been used to register",str(response.data))
+        assert response.status=="200 OK"
+    """
+   
 
     def test_post_register_endpoint_with_poor_spelling(self):
         #Testing the register end point if method is get but endpoint spelt poorly
