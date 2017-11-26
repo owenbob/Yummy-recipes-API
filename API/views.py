@@ -1,109 +1,16 @@
-from flask import Flask,request,jsonify,make_response
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt 
 from functools import wraps
 import uuid
 from validate_email import validate_email
+from API import app
+from API.models import db
+from flask import request,jsonify,make_response
+from API.models import User,Category,Recipe
 
 
 
-
-app = Flask(__name__)
-
-app.config["SECRET_KEY"] = "********"
-
-#directing API to databse yummy_recipes
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://yummyrecipes:admin@localhost:5432/yummy_recipes"
-
-db = SQLAlchemy(app)
-
-
-#-----------------------------------------------SQLALCHEMY MODELS-----------------------------------------------------
-
-
-#User Model in SQL
-class User(db.Model):
-    
-    # __table__ = "Users"
-
-       
-    username = db.Column(db.String(50))
-    email = db.Column(db.String(60),primary_key=True)
-    password = db.Column(db.String(80))
-    
-
-
-    def __init__(self,username,email, password):
-        #initiliazing User class constructor
-        self.username=username
-        self.email = email
-        self.password = password
-       
-        
-
-
-    def __repr__(self):
-        #method to return user information when querying database
-        return "<User: %s>" % self.email
-
-
-class Category(db.Model):
-    
-    __tablename__ = "category"
-
-    category_id = db.Column(db.String(100), primary_key=True)
-    category_title = db.Column(db.String(30))
-    category_description = db.Column(db.String(1000))
-    email = db.Column(db.String(60))
-
-
-
-    def __init__(self, category_id,category_title, category_description, email):
-        #initiliazing recipe class constructor
-        self.category_id=category_id
-        self.category_title = category_title
-        self.category_description = category_description
-        self.email= email
-       
-
-
-    def __repr__(self):
-        #method for returning data when querying database
-        return "<Category: %s>" % self.category_title
-
-    
-
-class Recipe(db.Model):
-    
-    __tablename__ = "Recipes"
-
-    recipe_id = db.Column(db.String(100), primary_key=True,)
-    recipe_title = db.Column(db.String(30))
-    recipe_description = db.Column(db.String(1000))
-    category_id = db.Column(db.String(100),db.ForeignKey('category.category_id'))
-    category = db.relationship('Category',backref=db.backref('recipe', lazy=True))
-    email = db.Column(db.String(60))
-    
-
-    def __init__(self, recipe_id, recipe_title,recipe_description,category_id,email):
-        #initiliazing recipe class constructor
-        self.recipe_id= recipe_id
-        self.recipe_title = recipe_title
-        self.recipe_description= recipe_description
-        self.category_id =category_id
-        self.email= email
-       
-
-
-    def __repr__(self):
-        #method for returning data when querying database
-        return "<Recipe: %s>" % self.recipe_title
-
-
-
-#-----------------------------------------------ROUTES/ENDPOINTS----------------------------------------------------
 
 #Route for registering a user.This route takes the users details and assigns them a unique id
 @app.route("/register",methods=["POST"])
@@ -137,7 +44,7 @@ def create_user():
   
 
    
-"""   
+""" 
 #Route for obtaining all users in the database
 @app.route("/registered_users",methods=["GET"])
 def get_users():
@@ -331,7 +238,7 @@ def edit_category(current_user, category_id):
     data = request.get_json()
     if data["category_description"] == "":
         return jsonify({"message":"Please ensure that you have input a category description"})
-
+    category.category_title = data["category_title"]
     category.category_description=data["category_description"]
     db.session.commit()
 
@@ -459,6 +366,7 @@ def edit_recipe(current_user, recipe_id):
     if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
     data = request.get_json()
+    recipe.recipe_title =data["recipe_title"]
     recipe.recipe_description=data["recipe_description"]
     db.session.commit()
 
