@@ -1,10 +1,13 @@
 from unittest import TestCase
-from API.app import User,Category,Recipe, db, app
+from API.models import User,Category,Recipe
+from API import app
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+from API.models import db
+
 
 class BaseTestCase(TestCase):
     # def create_app(self):
@@ -20,18 +23,23 @@ class BaseTestCase(TestCase):
         db.create_all()
 
         password="123"
-        self.user = {"david","david@gmail.com",password}
+        self.user = {
+            "username":"david",
+            "email":"david@gmail.com",
+            "password":password
+            }
         
         password_hash = generate_password_hash(password, method='sha256')
         user=User("david","david@gmail.com",password=password_hash)
-
+        
+        #user.save()
+        
         db.session.add(user)
         db.session.commit()
-
+        #print("***************************************************** User instance commited in DB *******************************")
+        
         self.invalid_data = {}
-        #self.incomplete_user = {"","david@gmail.com",password}
-        #self.invalid_email_user = {"red","dwrndgmail.com",password}
-        #self.user2 = {"Jackson","david@gmail.com","password"}
+        
 
         
         self.category = {
@@ -56,7 +64,10 @@ class BaseTestCase(TestCase):
         db.session.commit()
        
         
-        self.user = {"username":"david","password": "123"}
+        self.user = {
+            "username":"david",
+            "password": "123"
+            }
         response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
 

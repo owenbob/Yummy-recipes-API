@@ -1,7 +1,9 @@
 
 import json
-from API.app import User,Category,Recipe, db, app
+from API.models import User,Category,Recipe
+from API import  app
 from tests.baseTest import BaseTestCase
+from API.models import db
 
 
 class Authorization(BaseTestCase):
@@ -14,7 +16,7 @@ class Authorization(BaseTestCase):
         
         result=self.client.get("/register")
         assert result.status =="405 METHOD NOT ALLOWED"
- 
+    
     def test_put_at_register_endpoint(self):
         #Testing the register end point
         #If the method is an PUT Method Should not be allowed
@@ -41,32 +43,20 @@ class Authorization(BaseTestCase):
         response = self.client.post("/register",data=json.dumps(self.user),headers={"Content-Type":"application/json"})
         self.assertIn("New user  has been created!",str(response.data))
         assert response.status=="200 OK"
-    """
-    def test_post_at_register_user(self):
-        #Testing the register end point
-        #If the method is a POST Method Should  be allowed and receive a positive status code
-        #If Data posted through this method,it should allow and have a positce response
-        response = self.client.post("/register",data=json.dumps(self.invalid_data),headers={"Content-Type":"application/json"})
-        self.assertIn("Invalid Data Submitted",str(response.data))
-        assert response.status=="200 OK"
-
-
-    def test_post_at_register_user(self):
-        #Testing the register end point
-        #If the method is a POST Method Should  be allowed and receive a positive status code
-        #If Data posted through this method,it should allow and have a positce response
-        response = self.client.post("/register",data=json.dumps(self.invalid_data),headers={"Content-Type":"application/json"})
-        self.assertIn("Invalid Data Submitted",str(response.data))
-        assert response.status=="200 OK"
+    
     
     def test_post_at_register_user(self):
         #Testing the register end point
         #If the method is a POST Method Should  be allowed and receive a positive status code
         #If Data posted through this method,it should allow and have a positce response
-        response = self.client.post("/register",data=json.dumps(self.incomplete_user),headers={"Content-Type":"application/json"})
-        self.assertIn("This email has already been used to register",str(response.data))
+        response = self.client.post("/register",data=json.dumps(self.invalid_data),headers={"Content-Type":"application/json"})
+        self.assertIn("Invalid Data Submitted",str(response.data))
         assert response.status=="200 OK"
-    """
+
+
+  
+    
+    
    
 
     def test_post_register_endpoint_with_poor_spelling(self):
@@ -393,7 +383,7 @@ class Authorization(BaseTestCase):
         self.assertIn("Category deleted!",str(response2.data))
         assert response.status=="200 OK"
     
-    def test_delete_at_category_recipe_endpoint(self):
+    def test_delete_at_category_with_wrong_id_recipe_endpoint(self):
         #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
