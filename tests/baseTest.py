@@ -33,13 +33,17 @@ class BaseTestCase(TestCase):
         password_hash = generate_password_hash(password, method='sha256')
         user=User("david","david@gmail.com",password=password_hash)
         
-        #user.save()
+        
         
         db.session.add(user)
         db.session.commit()
-        #print("***************************************************** User instance commited in DB *******************************")
+        
         
         self.invalid_data = {}
+        self.user_details = {
+            "username":"david",
+            "password":"123"
+        }
         
 
         
@@ -65,11 +69,11 @@ class BaseTestCase(TestCase):
         db.session.commit()
        
         
-        self.user = {
+        self.user_logins = {
             "username":"david",
             "password": "123"
             }
-        response = self.client.post("/login", data=json.dumps(self.user),headers={"Content-Type": "application/json"})
+        response = self.client.post("/login", data=json.dumps(self.user_logins),headers={"Content-Type": "application/json"})
         token = json.loads(response.data.decode())["token"]
 
         self.headers= {"x-access-token": token}
