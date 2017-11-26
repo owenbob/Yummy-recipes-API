@@ -43,55 +43,6 @@ def create_user():
 
   
 
-   
-""" 
-#Route for obtaining all users in the database
-@app.route("/registered_users",methods=["GET"])
-def get_users():
-    users = User.query.all()
-
-    registered_users= []
-
-    for user in users:
-        user_data = {}
-        user_data["username"] = user.username
-        user_data["email"] = user.email
-        user_data["password"] = user.password
-        registered_users.append(user_data)
-
-    return jsonify({"users" : registered_users})
-    
-#Route to obtain an individual user in the databse using their id
-@app.route("/registered_user/<email>" ,methods=["GET"])
-def get_user(email):
-    
-    user = User.query.filter_by(email=email).first()
-
-    if not user:
-        return jsonify({"message" : "No user found!"})
-
-    user_data = {}
-    user_data["username"] = user.username
-    user_data["email"] =user.email
-    user_data["password"] = user.password
-    
-    return jsonify({"user" : user_data})
- 
-
-
-#Route to delete an individual user using their email
-@app.route("/delete_registered_user/<email>",methods=["DELETE"])
-def delete_user(email):
-    user = User.query.filter_by(email=email).first()
-
-    if not user:
-        return jsonify({"message" : "No user found!"})
-
-    db.session.delete(user)
-    db.session.commit()
-
-    return jsonify({"message" : "The user has been deleted!"})
-"""
 #Method to assign token to function
 def token_needed(f):
     @wraps(f)
