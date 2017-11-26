@@ -316,6 +316,10 @@ def edit_recipe(current_user, recipe_id):
 
     if not  recipe:
         return jsonify({"message" : "No Recipe found!"})
+
+    if not request.json:
+        return jsonify({"message ":"Invalid Data Submitted"})
+        
     data = request.get_json()
     recipe.recipe_title =data["recipe_title"]
     recipe.recipe_description=data["recipe_description"]

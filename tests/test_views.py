@@ -115,13 +115,24 @@ class Authorization(BaseTestCase):
         assert response.status=="401 UNAUTHORIZED"
     
     
-    def test_post_at_create_recipe_endpoint(self):      
+    def test_post_at_create_category_endpoint_with_category_details(self):      
         #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
+        #Should receive message Category created
         response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
         self.assertIn("Category created!",str(response.data))
         assert response.status=="200 OK"
-    
+
+
+    def test_post_at_create_category_endpoint_with_invalid_data(self):
+         #Testing the create_category end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code but on submiting invalid data
+        #Invalid data message should be received
+        response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.invalid_data))
+        self.assertIn("Invalid Data Submitted",str(response.data))
+        assert response.status=="200 OK"
+        
+
     
     def test_post_at_create_category_endpoint_with_poor_spelling(self):      
         #Testing the create_recipe end point
@@ -241,6 +252,7 @@ class Authorization(BaseTestCase):
         #Testing the recipe end point
         #If the method is a get ,and with proper with authorisation then should have a positive status
         response = self.client.get("/category/<category_id>",headers = self.headers, content_type='application/json')
+        self.assertIn("No Category found!",str(response.data))
         assert response.status=="200 OK"
     
         
@@ -263,6 +275,7 @@ class Authorization(BaseTestCase):
         response = self.client.get("/category/1",headers = self.headers, content_type='application/json')
         self.assertIn("First meal of the morning",str(response.data))
         assert response.status=="200 OK"
+
     
 
         
@@ -306,6 +319,18 @@ class Authorization(BaseTestCase):
 
         response2 = self.client.put("/edit_category/1",headers = self.headers, content_type='application/json',data=json.dumps(self.category))
         self.assertIn("Category has been edited!",str(response2.data))
+        assert response.status=="200 OK"
+
+
+
+
+    def test_put_at_edit_category_endpoint_with_category_id_with_invalid_data(self):
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
+
+        response2 = self.client.put("/edit_category/1",headers = self.headers, content_type='application/json',data=json.dumps(self.invalid_data))
+        self.assertIn("Invalid Data Submitted",str(response2.data))
         assert response.status=="200 OK"
 
     def test_put_at_edit_category_endpoint_with_wrong_id(self):
@@ -416,6 +441,16 @@ class Authorization(BaseTestCase):
 
         response = self.client.post("/create_recipe/1",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
         self.assertIn("Recipe created!",str(response.data))
+        assert response.status=="200 OK"
+
+
+    def test_post_at_create_recipe_endpoint_with_invalid_data(self):      
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
+
+        response = self.client.post("/create_recipe/1",headers = self.headers, content_type='application/json', data=json.dumps(self.invalid_data))
+        self.assertIn("Invalid Data Submitted",str(response.data))
         assert response.status=="200 OK"
     
     
@@ -555,9 +590,6 @@ class Authorization(BaseTestCase):
         assert response.status=="200 OK"
     
     
-    
-
-    
     def test_get_at_recipe_endpoint_with_authorisation_and_the_recipe_id(self):
         #Testing the recipe end point
         #If the method is a get ,and with proper with authorisation then should have a positive status
@@ -604,7 +636,19 @@ class Authorization(BaseTestCase):
         response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
 
         response = self.client.post("/create_recipe/1",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
-        response = self.client.put("/edit_recipe/1",headers = self.headers, content_type='application/json',data=json.dumps(self.recipe))
+        response2 = self.client.put("/edit_recipe/1",headers = self.headers, content_type='application/json',data=json.dumps(self.recipe))
+        self.assertIn("Recipe has been edited!",str(response2.data))
+        assert response.status=="200 OK"
+
+
+    def test_put_at_edit_recipe_endpoint_with_invalid_data(self):
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
+
+        response = self.client.post("/create_recipe/1",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
+        response2 = self.client.put("/edit_recipe/1",headers = self.headers, content_type='application/json',data=json.dumps(self.invalid_data))
+        self.assertIn("Invalid Data Submitted",str(response2.data))
         assert response.status=="200 OK"
 
     
