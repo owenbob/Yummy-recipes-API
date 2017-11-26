@@ -107,3 +107,4 @@ venv.bak/
 Virtual_Environment/
 .DS_Store 
 .vscode
+migrations/
