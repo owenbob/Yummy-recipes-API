@@ -21,6 +21,7 @@ env:
 
 
 before_script:
+  - sudo -u postgres createuser yummyrecipes
   - sudo -u postgres createdb yummy_recipes
   - sudo -u postgres createdb test
   - python manager.py db init
