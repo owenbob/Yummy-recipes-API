@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/owenbob/Yummy-recipes-API/badges/gpa.svg)](https://codeclimate.com/github/owenbob/Yummy-recipes-API)
+
 [![Build Status](https://travis-ci.org/owenbob/Yummy-recipes-API.svg?branch=master)](https://travis-ci.org/owenbob/Yummy-recipes-API)
 [![Coverage Status](https://coveralls.io/repos/github/owenbob/Yummy-recipes-API/badge.svg)](https://coveralls.io/github/owenbob/Yummy-recipes-API)
 
