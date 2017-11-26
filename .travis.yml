@@ -1,25 +1,38 @@
 language: python
 python:
- 
- - "3.6"
- 
+  - "3.6"
+branches:
+    only:
+        - master
+services:
+  - postgresql
+
 # command to install dependencies
-install: 
-- pip install click
-- pip install  Flask
-- pip install  Flask-SQLAlchemy
-- pip install  Flask-Testing
-- pip install  itsdangerous
-- pip install  Jinja2
-- pip install  MarkupSafe
-- pip install  psycopg2
-- pip install  PyJWT
-- pip install  SQLAlchemy
-- pip install  Werkzeug
- 
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install coverage
+
+env:
+  global:
+    - export SECRET_KEY="********"
+    - export DATABASE_URL="postgresql://yummyrecipes:admin@localhost:5432/yummy_recipes"
+    - export TEST_DB="postgresql://yummyrecipes:admin@localhost:5432/test"
+
+
+before_script:
+  - sudo -u postgres createdb yummy_recipes
+  - sudo -u postgres createdb test
+  - python manager.py db init
+  - python manager.py db migrate
+  - python manager.py db upgrade
+
 # command to run tests
-script: 
-- pytest
+script:
+    - nosetests --with-coverage --cover-package=API
+after_success:
+  coveralls
+
 
 
 

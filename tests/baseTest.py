@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 from API.models import User,Category,Recipe
 from API import app
@@ -11,7 +12,7 @@ from API.models import db
 
 class BaseTestCase(TestCase):
     # def create_app(self):
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://yummyrecipes:admin@localhost:5432/test"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://yummyrecipes:admin@localhost:5432/test" or os.environ('TEST_DB')
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
     def setUp(self):
