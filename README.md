@@ -38,7 +38,7 @@ pip install -r requirements.txt
 ## Run the application
 At the terminal or console type
 ```
-python app.py
+python run.py
 ```
 To run tests  cd into tests directory run this command at the console/terminal
 ```
