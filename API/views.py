@@ -13,6 +13,7 @@ from API.models import User,Category,Recipe
 
 
 
+
 #Route for registering a user.This route takes the users details and assigns them a unique id
 @app.route("/register",methods=["POST"])
 def create_user():
@@ -24,53 +25,63 @@ def create_user():
             "message ":"Invalid Data Submitted"
             }),400
 
-    user_info = request.get_json(force=True)
-    
-    if user_info:
-        hashed_password = generate_password_hash(user_info["password"], method="sha256")
+    user_info = request.get_json()
+    username =user_info.get("username")
+    email =user_info.get("email")
+    password =user_info.get("password")
 
-        new_user = User(
-            username=user_info["username"], 
-            email=user_info["email"], 
+    if  not (username and  email and  password):
+            return jsonify({
+                "Status":"Fail",
+                "message":"Please ensure you have input all the required fields"
+            }),400
+    
+    
+    hashed_password = generate_password_hash(password, method="sha256")
+
+    new_user = User(
+            username=username, 
+            email=email, 
             password=hashed_password,
             user_date_stamp = str(datetime.datetime.now())
             )
         
-        if  not re.match(
-            "^[A-Za-z0-9_-]*$", 
-            user_info['username']) or  not re.match(
-            "^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", 
-            user_info['email']):
-            return jsonify({
-                "Status":"Fail",
-                "message":"Please ensure you have not input special characters"
-            }),400
-        email_already_exists = db.session.query(db.exists().where(User.email == user_info["email"])).scalar()
-        if email_already_exists:
-            return jsonify({
-                "Status":"Fail",
-                "message":"This email has already been used to register"
-                }),400
-        
-        if user_info["username"] == "" or user_info["email"]== "" or user_info["password"]== "":
-            return jsonify({
-                "Status":"Fail",
-                "message":"Please ensure you have input all your details"
-                }),400
 
-        if  not validate_email(user_info["email"]):
-            return jsonify({
-                "Status":"Fail",
-                "message":"Please input correct email"
-                }),400
-
-        db.session.add(new_user)
-        db.session.commit()
-
+    if  not re.match(
+        "^[A-Za-z0-9_-]*$", 
+        username) or  not re.match(
+        "^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", 
+        email):
         return jsonify({
-            "Status":"Success",
-            "message" : "New user  has been created!"
-            }),201
+            "Status":"Fail",
+            "message":"Please ensure you have not input special characters"
+        }),400
+    email_already_exists = db.session.query(db.exists().where(User.email == email)).scalar()
+    if email_already_exists:
+        return jsonify({
+            "Status":"Fail",
+            "message":"This email has already been used to register"
+            }),400
+    
+    if username == "" or email == "" or password== "":
+        return jsonify({
+            "Status":"Fail",
+            "message":"Please ensure you have input all your details"
+            }),400
+
+    if  not validate_email(email):
+        return jsonify({
+            "Status":"Fail",
+            "message":"Please input correct email"
+            }),400
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({
+        "Status":"Success",
+        "message" : "New user  has been created!"
+        }),201
 
   
 
@@ -144,21 +155,24 @@ def create_category(current_user):
             }),400
     
     data = request.get_json()
+    category_title =data.get("category_title")
+    category_description =data.get("category_description")
 
     new_category = Category(
         category_id=str(uuid.uuid4()),
-        category_title=data["category_title"],
-        category_description=data["category_description"],
+        category_title=category_title,
+        category_description=category_description,
         email=current_user.email,
         category_date_stamp =str(datetime.datetime.now())
     )
-    if  not re.match("^[A-Za-z0-9_-]*$", data["category_title"]) or  not re.match("^[A-Za-z0-9_-]*$", data["category_description"]):
-            return jsonify({
-                "Status":"Fail",
-                "message":"Please ensure you have not input special characters"
+    if  not (category_title and category_description):
+        return jsonify({
+            "Status":"Fail",
+            "message":"Please ensure that you have input all the fields"
             }),400
+    
 
-    if data["category_title"]=="" or data["category_description"]== "":
+    if category_title == "" or category_description == "":
         return jsonify({
             "Status":"Fail",
             "message":"Please ensure that you have input a category title and description"
@@ -199,6 +213,12 @@ def get_all_categories(current_user):
                 "Status":"Success",
                 "Categories" : output
                 }),200
+    
+    if page != 1:
+        return jsonify({
+            "Status":"Fail",
+            "Message":"Pages are set to default one page"
+        }),400
         
 
     if limit:
@@ -271,19 +291,24 @@ def edit_category(current_user, category_id):
             }),400
 
     data = request.get_json()
-    if data["category_title"] or data["category_description"] == "":
+    category_title=data.get("category_title")
+    category_description=data.get("category_description")
+
+    if  not (category_title and category_description):
         return jsonify({
             "Status":"Fail",
-            "message":"Please ensure that you have input a category description"
-            }),400
-    if  not re.match("^[A-Za-z0-9_-]*$", data["category_title"]) or  not re.match("^[A-Za-z0-9_-]*$", data["category_description"]):
-            return jsonify({
-                "Status":"Fail",
-                "message":"Please ensure you have not input special characters"
+            "message":"Please ensure that you have input all the fields"
             }),400
 
-    category.category_title = data["category_title"]
-    category.category_description=data["category_description"]
+    if category_title == "" or category_description == "":
+        return jsonify({
+            "Status":"Fail",
+            "message":"Please ensure that you have input a category  title and description"
+            }),400
+   
+
+    category.category_title = category_title
+    category.category_description=category_description
     db.session.commit()
 
     return jsonify({
@@ -330,17 +355,20 @@ def create_recipe(current_user,category_id):
             }),400
     
     data = request.get_json()
-    if  not re.match("^[A-Za-z0-9_-]*$", data["recipe_title"]) or  not re.match("^[A-Za-z0-9_-]*$", data["recipe_description"]):
-            return jsonify({
+    recipe_title =data.get("recipe_title")
+    recipe_description=data.get("recipe_description")
+    if  not (recipe_title and recipe_description):
+        return jsonify({
                 "Status":"Fail",
-                "message":"Please ensure you have not input special characters"
+                "message":"Please ensure you have all fields"
             }),400
 
 
-    if  data["recipe_title"] == "" or data["recipe_description"] == "":
+
+    if  recipe_title == "" or recipe_description == "":
         return jsonify({
             "Status":"Fail",
-            "message":"Please ensure that you have input a recipe_title,recipe_description and category title"
+            "message":"Please ensure that you have input a recipe_title and recipe_description "
             }),400
 
      
@@ -390,6 +418,12 @@ def get_all_recipes(current_user):
                 "Recipes" : output
                 }),200
         
+
+    if page != 1:
+        return jsonify({
+            "Status":"Fail",
+            "Message":"Pages are set to default one page"
+        }),400
 
     if limit:
         paginate_recipes = Recipe.query.filter_by(email=current_user.email).paginate(page, limit, False).items
@@ -467,13 +501,15 @@ def edit_recipe(current_user, recipe_id):
             }),400
         
     data = request.get_json()
-    if  not re.match("^[A-Za-z0-9_-]*$", data["recipe_title"]) or  not re.match("^[A-Za-z0-9_-]*$", data["recipe_description"]):
+    recipe_title = data.get("recipe_title")
+    recipe_description = data.get("recipe_description")
+    if  not (re.match("^[A-Za-z0-9_-_ _.]*$", recipe_title) and re.match("^[A-Za-z0-9_-_ _.]*$", recipe_description)):
             return jsonify({
                 "Status":"Fail",
                 "message":"Please ensure you have not input special characters"
             }),400
-    recipe.recipe_title =data["recipe_title"]
-    recipe.recipe_description=data["recipe_description"]
+    recipe.recipe_title =recipe_title
+    recipe.recipe_description=recipe_description
     
     db.session.commit()
 
