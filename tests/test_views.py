@@ -728,10 +728,10 @@ class Authorization(BaseTestCase):
 
         response = self.client.post("/create_recipe/1",headers = self.headers, content_type='application/json', data=json.dumps(self.recipe))
         self.assertIn("Recipe created!",str(response.data))
-        response1 = self.client.response = self.client.put("/set_public_recipe/1",headers=self.headers,content_type='application/son',data=json.dumps(self.recipe))
+        response1 = self.client.response = self.client.patch("/set_public_recipe/1",headers=self.headers,content_type='application/son',data=json.dumps(self.recipe))
         self.assertIn("Recipe is now Public",str(response1.data))
-
-        assert response.status=="201 CREATED"
+        # import pdb ; pdb.set_trace()
+        assert response1.status=="201 CREATED"
     
     def test_get_at_set_public_recipe_endpoint_(self):
         #If the method is a get , Method Should not be allowed
@@ -772,7 +772,7 @@ class Authorization(BaseTestCase):
              data=json.dumps(self.recipe)
              )
         self.assertIn("Recipe created!",str(response.data))
-        response = self.client.response = self.client.put(
+        response = self.client.response = self.client.patch(
             "/set_public_recipe/1",
             headers=self.headers,
             content_type='application/son',
@@ -781,7 +781,7 @@ class Authorization(BaseTestCase):
         self.assertIn("Recipe is now Public",str(response.data))
         response1 = self.client.response = self.client.get("/home")
         self.assertIn("1.Obtain eggs",str(response1.data))
-        assert response.status=="200 OK"
+        assert response1.status=="200 OK"
     
     def test_get_at_home_endpoint_(self):
         #If the method is a get , Method Should not be found
