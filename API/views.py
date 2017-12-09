@@ -1,14 +1,15 @@
+from flask import request,jsonify,make_response
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from validate_email import validate_email
 import datetime
 import jwt 
 import re
-from functools import wraps
 import uuid
-from validate_email import validate_email
+
 from API import app
-from API.models import db
-from flask import request,jsonify,make_response
 from API.models import User,Category,Recipe
+from API.models import db
 
 
 
@@ -215,29 +216,30 @@ def get_all_categories(current_user):
                 "Status":"Success",
                 "Categories" : output
                 }),200
-    #To check the number of pages that the user may have specified and that it is 1
-    # if page != 1:
-    #     return jsonify({
-    #         "Status":"Fail",
-    #         "Message":"Pages are set to default one page"
-    #     }),400
+  
         
     #If statement to handle pagination 
     if limit:
         paginate_categories = Category.query.filter_by(email=current_user.email).paginate(page, limit, False).items
-        for category in paginate_categories:
-            category_data = {}
-            category_data["category_id"] = category.category_id
-            category_data["category_title"] = category.category_title
-            category_data["category_description"] = category.category_description
-            category_data["Category_date_stamp"] = category.category_date_stamp
-            output.append(category_data)
+        if paginate_categories:
+            for category in paginate_categories:
+                category_data = {}
+                category_data["category_id"] = category.category_id
+                category_data["category_title"] = category.category_title
+                category_data["category_description"] = category.category_description
+                category_data["Category_date_stamp"] = category.category_date_stamp
+                output.append(category_data)
 
-        return jsonify({
-            "Status":"Success",
-            "Categories" : output
-            }),200
-    #stament to handle return of all categories        
+            return jsonify({
+                "Status":"Success",
+                "Categories" : output
+                }),200
+        else:
+            return jsonify({
+                "Status":"Fail",
+                "Message" : " 404-Page Not Found"
+                }),404
+    #statement to handle return of all categories        
     else:
         categories = Category.query.filter_by(email=current_user.email).all()
         for category in categories:
@@ -422,31 +424,30 @@ def get_all_recipes(current_user):
                 "Status":"Success",
                 "Recipes" : output
                 }),200
-        
-    #To check the number of pages that the user may have specified and that it is 1
-    if page != 1:
-        return jsonify({
-            "Status":"Fail",
-            "Message":"Pages are set to default one page"
-        }),400
 
     #If statement to handle pagination 
     if limit:
         paginate_recipes = Recipe.query.filter_by(email=current_user.email).paginate(page, limit, False).items
-        for recipe in paginate_recipes:
-            recipe_data = {}
-            recipe_data["recipe_id"] = recipe.recipe_id
-            recipe_data["recipe_title"] = recipe.recipe_title
-            recipe_data["category_id"] =recipe.category_id
-            recipe_data["recipe_description"] = recipe.recipe_description
-            recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
-            recipe_data["recipe_public_status"] = recipe.recipe_public_status
-            output.append(recipe_data)
+        if pagoinate_recipes:
+            for recipe in paginate_recipes:
+                recipe_data = {}
+                recipe_data["recipe_id"] = recipe.recipe_id
+                recipe_data["recipe_title"] = recipe.recipe_title
+                recipe_data["category_id"] =recipe.category_id
+                recipe_data["recipe_description"] = recipe.recipe_description
+                recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
+                recipe_data["recipe_public_status"] = recipe.recipe_public_status
+                output.append(recipe_data)
 
-        return jsonify({
-            "Status":"Success",
-            "Recipes" : output
-            }),200
+            return jsonify({
+                "Status":"Success",
+                "Recipes" : output
+                }),200
+        else:
+            return jsonify({
+                "Status":"Success",
+                "Messages" : "404-Page Not Found"
+                }),404
     #Statement to get all recipes          
     else:
         recipes = Recipe.query.filter_by(email=current_user.email).all()
@@ -530,10 +531,11 @@ def edit_recipe(current_user, recipe_id):
         "message" : "Recipe has been edited!"
         }),201
 
-
+#Route to set recipe status to public so that it can be displayed on the home page
 @app.route("/set_public_recipe/<recipe_id>",methods=["PATCH"])
 @token_needed
 def set_public_recipe(current_user,recipe_id):
+    #Querying the database to see if the recipe exists 
     recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
 
     if not recipe:
@@ -548,10 +550,11 @@ def set_public_recipe(current_user,recipe_id):
         "Status":"Success",
         "message" : "Recipe is now Public!"
         }),201
-
+#route to delete recipe from database 
 @app.route("/delete_recipe/<recipe_id>", methods=["DELETE"])
 @token_needed
 def delete_recipe(current_user, recipe_id):
+    #Querying the database to see if the recipe exists 
     recipe = Recipe.query.filter_by(recipe_id=recipe_id, email=current_user.email).first()
 
     if not recipe:
@@ -568,12 +571,13 @@ def delete_recipe(current_user, recipe_id):
         "message" : "Recipe deleted!"
         }),200
 
-
+#Route to display public recipes
 @app.route("/home",methods=["GET"])
 def public_recipes():
     output=[]
-
+    ##Querying the database to see if the recipe exists 
     recipes = Recipe.query.filter_by(recipe_public_status=True).all()
+
     for recipe in recipes:
         recipe_data = {}
         recipe_data["recipe_id"] = recipe.recipe_id
