@@ -1,23 +1,28 @@
 import os
 from unittest import TestCase
-from API.models import User,Category,Recipe
-from API import app
+import datetime
+import json
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-import json
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+
 from API.models import db
-import datetime
+from API.models import User,Category,Recipe
+from API import app
 
 
 class BaseTestCase(TestCase):
-    
+    #setting test database
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://yummyrecipes:admin@localhost:5432/test" or os.environ('TEST_DB')
     
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+    
     def setUp(self):
-        
+        """
+        SetUp method .This method is run before each test.It is where all variables for tests are declared 
+        and values set. It is important for setting the state ypour testing for in the application.
+        """
 
         self.client = app.test_client()
         db.init_app(app)
@@ -33,20 +38,14 @@ class BaseTestCase(TestCase):
         
         password_hash = generate_password_hash(password, method='sha256')
         user=User("david","david@gmail.com",password=password_hash,user_date_stamp=str(datetime.datetime.now()))
-        
-        
-        
         db.session.add(user)
         db.session.commit()
-        
         
         self.invalid_data = {}
         self.user_details = {
             "username":"david",
             "password":"123"
         }
-        
-
         
         self.category = {
             "category_title":"breakfast",
@@ -57,9 +56,6 @@ class BaseTestCase(TestCase):
         db.session.add(category)
         db.session.commit()
 
-        
-        
-        
         self.recipe ={
             "recipe_title":"rolex", 
             "recipe_description":"1.Obtain eggs"
@@ -68,7 +64,6 @@ class BaseTestCase(TestCase):
 
         db.session.add(recipe)
         db.session.commit()
-       
         
         self.user_logins = {
             "username":"david",
@@ -79,8 +74,12 @@ class BaseTestCase(TestCase):
 
         self.headers= {"x-access-token": token}
         
-
     def tearDown(self):
+        """
+        TearDown method.When testing,you want to maintain the state of the application.
+        Whenever  the test is run teardown is run after each test so as to restore 
+        the original state of the application
+        """
         db.session.remove()
         db.drop_all()
  

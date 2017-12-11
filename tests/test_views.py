@@ -1,8 +1,9 @@
 
 import json
+from tests.baseTest import BaseTestCase
+
 from API.models import User,Category,Recipe
 from API import  app
-from tests.baseTest import BaseTestCase
 from API.models import db
 
 
