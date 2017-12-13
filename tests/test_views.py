@@ -8,7 +8,7 @@ from API.models import db
 
 
 class Authorization(BaseTestCase):
-
+    
     
     #-----------------------REGISTER ENDPOINT--------------------------------
     def test_get_at_register_endpoint(self):
@@ -102,7 +102,7 @@ class Authorization(BaseTestCase):
         response = self.client.get("/login",data=json.dumps(self.user),headers = self.headers)
         self.assertIn("1.Could not verify",str(response.data))
         assert response.status=="400 BAD REQUEST"
-
+    
 
 
 
@@ -120,10 +120,25 @@ class Authorization(BaseTestCase):
         #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         #Should receive message Category created
-        response = self.client.post("/create_category",headers = self.headers, content_type='application/json', data=json.dumps(self.category))
-        self.assertIn("Category created!",str(response.data))
+        response = self.client.post(
+            "/create_category",headers = self.headers, 
+            content_type='application/json', 
+            data=json.dumps(self.category)
+            )
+        self.assertIn("This category  title already exists",str(response.data))
         assert response.status=="201 CREATED"
 
+    def test_post_at_create_category_endpoint_with_category_details(self):      
+        #Testing the create_recipe end point
+        #If the method is a Post , Method Should  be allowed and receive a positive status code
+        #Should receive message Category created
+        response = self.client.post(
+            "/create_category",headers = self.headers, 
+            content_type='application/json', 
+            data=json.dumps(self.category2)
+            )
+        self.assertIn("Category created!",str(response.data))
+        assert response.status=="201 CREATED"
 
     def test_post_at_create_category_endpoint_with_invalid_data(self):
          #Testing the create_category end point
@@ -161,7 +176,7 @@ class Authorization(BaseTestCase):
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.delete("/create_category")
         assert response.status=="405 METHOD NOT ALLOWED"
-
+    
     
     
     
@@ -320,7 +335,7 @@ class Authorization(BaseTestCase):
 
         response2 = self.client.put("/edit_category/1",headers = self.headers, content_type='application/json',data=json.dumps(self.category))
         self.assertIn("Category has been edited!",str(response2.data))
-        assert response.status=="201 CREATED"
+        assert response2.status=="201 CREATED"
 
 
 
@@ -788,5 +803,5 @@ class Authorization(BaseTestCase):
         #If the method is a get , Method Should not be found
         response = self.client.get("/Home")
         assert response.status=="404 NOT FOUND"
-
+    
     
