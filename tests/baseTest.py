@@ -55,7 +55,16 @@ class BaseTestCase(TestCase):
 
         db.session.add(category)
         db.session.commit()
+        
+        self.category2 = {
+            "category_title":"Drinks",
+            "category_description":"Taken 30 minutes before and after food."
+        }
+        category2=Category("30","Drinks","Taken 30 minutes before and after food.","david@gmail.com","2017-12-02 13:39:25.892164")
 
+        db.session.add(category)
+        db.session.commit()
+        
         self.recipe ={
             "recipe_title":"rolex", 
             "recipe_description":"1.Obtain eggs"
