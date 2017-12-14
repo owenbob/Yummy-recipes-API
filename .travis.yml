@@ -33,7 +33,3 @@ script:
     - nosetests --with-coverage --cover-package=API
 after_success:
   coveralls
-
-
-
-
