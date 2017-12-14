@@ -30,7 +30,8 @@ def create_user():
     username =user_info.get("username")
     email =user_info.get("email")
     password =user_info.get("password")
-    #Cehcking if all fields are filled.
+    
+    #Checking if all fields are filled.
     if  not (username and  email and  password):
             return jsonify({
                 "Status":"Fail",
