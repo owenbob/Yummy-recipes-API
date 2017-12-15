@@ -19,8 +19,7 @@ class BaseTestCase(TestCase):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
     
     def setUp(self):
-        """
-        SetUp method .This method is run before each test.It is where all variables for tests are declared 
+        """ SetUp method .This method is run before each test.It is where all variables for tests are declared 
         and values set. It is important for setting the state ypour testing for in the application.
         """
 
@@ -84,8 +83,7 @@ class BaseTestCase(TestCase):
         self.headers= {"x-access-token": token}
         
     def tearDown(self):
-        """
-        TearDown method.When testing,you want to maintain the state of the application.
+        """ TearDown method.When testing,you want to maintain the state of the application.
         Whenever  the test is run teardown is run after each test so as to restore 
         the original state of the application
         """
