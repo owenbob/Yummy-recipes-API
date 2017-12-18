@@ -155,16 +155,19 @@ def create_category(current_user):
             }),400
     #Obtain data from user
     data = request.get_json()
-    category_title =data.get("category_title")
-    category_description =data.get("category_description")
+    category_title = data.get("category_title")
+    category_description = data.get("category_description")
 
-    new_category = Category(
-        category_id=str(uuid.uuid4()),
-        category_title=category_title,
-        category_description=category_description,
-        email=current_user.email,
-        category_date_stamp =str(datetime.datetime.now())
-    )
+    titlecase_category = title_case(category_title)
+    
+    #Checking if category already exists
+    category_already_exists = db.session.query(db.exists().where(Category.category_title == titlecase_category)).scalar()
+    if category_already_exists:
+        return jsonify({
+            "Status":"Fail",
+            "message":"This category already exists"
+            }),400
+
     #Check if all fields are filled
     if  not (category_title and category_description):
         return jsonify({
@@ -178,6 +181,16 @@ def create_category(current_user):
             "Status":"Fail",
             "message":"Please ensure that you have input a category title and description"
             }),400
+
+
+    new_category = Category(
+        category_id = str(uuid.uuid4()),
+        category_title = title_case(category_title),
+        category_description = category_description,
+        email = current_user.email,
+        category_date_stamp = str(datetime.datetime.now())
+    )
+
     #Save new category in the database
     db.session.add(new_category)
     db.session.commit()
@@ -186,6 +199,7 @@ def create_category(current_user):
         "Status":"Success",
         "message" : "Category created!"
         }),201
+        
 
 #Route to get all categories
 @app.route("/categories", methods=["GET"])
@@ -606,4 +620,7 @@ def public_recipes():
         }),200
 
 
+def title_case(data):
+    data = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data.split())
+    return data
 
