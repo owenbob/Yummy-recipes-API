@@ -62,7 +62,7 @@ def create_user():
             "message":"Please ensure you have not input special characters"
         }),400
 
-     #Checking if email already exists   
+    #Checking if email already exists   
     email_already_exists = db.session.query(db.exists().where(User.email == email)).scalar()
     if email_already_exists:
         return jsonify({
@@ -182,7 +182,6 @@ def create_category(current_user):
             "message":"Please ensure that you have input a category title and description"
             }),400
 
-
     new_category = Category(
         category_id = str(uuid.uuid4()),
         category_title = title_case(category_title),
@@ -200,7 +199,6 @@ def create_category(current_user):
         "message" : "Category created!"
         }),201
         
-
 #Route to get all categories
 @app.route("/categories", methods=["GET"])
 @token_needed
@@ -248,6 +246,7 @@ def get_all_categories(current_user):
                 "Status":"Fail",
                 "Message" : " 404-Page Not Found"
                 }),404
+                
     #statement to handle return of all categories        
     else:
         categories = Category.query.filter_by(email=current_user.email).all()

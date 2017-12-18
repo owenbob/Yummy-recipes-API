@@ -3,38 +3,23 @@ from flask_sqlalchemy import SQLAlchemy
 from API import app
 
 
-
-
-
 db = SQLAlchemy(app)
 
-
 #-----------------------------------------------SQLALCHEMY MODELS-----------------------------------------------------
-
-
 #User Model in SQL
 class User(db.Model):
     
-    # __table__ = "Users"
-
-       
     username = db.Column(db.String(50))
     email = db.Column(db.String(60),primary_key=True)
     password = db.Column(db.String(80))
     user_date_stamp =db.Column(db.String(30))
     
-
-
     def __init__(self,username,email, password,user_date_stamp):
         #initiliazing User class constructor
         self.username=username
         self.email = email
         self.password = password
         self.user_date_stamp = user_date_stamp
-
-         
-        
-
 
     def __repr__(self):
         #method to return user information when querying database
@@ -51,8 +36,6 @@ class Category(db.Model):
     email = db.Column(db.String(60))
     category_date_stamp = db.Column(db.String(30))
 
-
-
     def __init__(self, category_id,category_title, category_description, email,category_date_stamp):
         #initiliazing recipe class constructor
         self.category_id = category_id
@@ -61,8 +44,6 @@ class Category(db.Model):
         self.email = email
         self.category_date_stamp = category_date_stamp
        
-
-
     def __repr__(self):
         #method for returning data when querying database
         return "<Category: %s>" % self.category_title
@@ -82,7 +63,6 @@ class Recipe(db.Model):
     recipe_date_stamp = db.Column(db.String(30))
     recipe_public_status = db.Column(db.Boolean)
     
-
     def __init__(self, recipe_id, recipe_title,recipe_description,category_id,email,recipe_date_stamp,recipe_public_status):
         #initiliazing recipe class constructor
         self.recipe_id= recipe_id
@@ -92,9 +72,6 @@ class Recipe(db.Model):
         self.email= email
         self.recipe_date_stamp = recipe_date_stamp
         self.recipe_public_status = recipe_public_status
-
-       
-
 
     def __repr__(self):
         #method for returning data when querying database
