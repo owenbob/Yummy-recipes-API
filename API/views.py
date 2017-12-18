@@ -436,7 +436,7 @@ def get_all_recipes(current_user):
                 recipe_data["recipe_description"] = recipe.recipe_description
                 recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
                 recipe_data ["recipe_public_status"] = recipe.recipe_public_status
-            output.append(recipe_data)
+                output.append(recipe_data)
                 output.append(recipe_data)
 
             return jsonify({
@@ -586,7 +586,8 @@ def public_recipes():
     recipes = Recipe.query.filter_by(recipe_public_status=True).all()
 
     for recipe in recipes:
-        category = Category.query.filter_by(category_id=recipe.category_id, email=current_user.email).first()
+        category = Category.query.filter_by(category_id=recipe.category_id).first()
+
         recipe_data = {}
         recipe_data["recipe_id"] = recipe.recipe_id
         recipe_data["recipe_title"] = recipe.recipe_title
@@ -596,7 +597,7 @@ def public_recipes():
         recipe_data["category_date_stamp"] = category.category_date_stamp
         recipe_data["recipe_description"] = recipe.recipe_description
         recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
-        recipe_data ["recipe_public_status"] = recipe.recipe_public_status
+        recipe_data["recipe_public_status"] = recipe.recipe_public_status
         output.append(recipe_data)
 
     return jsonify({
