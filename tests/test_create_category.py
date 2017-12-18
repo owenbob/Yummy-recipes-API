@@ -62,14 +62,11 @@ class Create_category(BaseTestCase):
             )
         assert response.status=="400 BAD REQUEST"
         
-
-
     def test_post_at_create_category_endpoint_with_poor_spelling(self):      
         #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.post("/create_Category")
         assert response.status=="404 NOT FOUND"
-
 
     def test_get_at_create_category_endpoint_endpoint(self):
         #Testing the create_recipe end point
@@ -77,13 +74,11 @@ class Create_category(BaseTestCase):
         response = self.client.get("/create_category")
         assert response.status=="405 METHOD NOT ALLOWED"
 
-
     def test_put_at_create_category_endpoint(self):
         #Testing the create_recipe end point
         #If the method is a Post , Method Should  be allowed and receive a positive status code
         response = self.client.put("/create_category")
         assert response.status=="405 METHOD NOT ALLOWED"
-
 
     def test_delete_at_create_category_endpoint(self):
         #Testing the create_recipe end point

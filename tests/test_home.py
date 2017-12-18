@@ -15,7 +15,6 @@ class Home(BaseTestCase):
         response = self.client.post("/home")
         assert response.status=="405 METHOD NOT ALLOWED"
 
- 
     def test_put_at_home_endpoint(self):
         #If the method is a put , Method Should  be not  allowed 
         response = self.client.put("/home")

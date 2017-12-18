@@ -9,7 +9,6 @@ from API.models import db
 class Login(BaseTestCase):
     #-----------------------LOGIN ENDPOINT--------------------------------
 
-
     def test_post_at_login_endpoint(self):
         #Testing the login end point
         #If the method is a POST Method Should  be not be allowed 
@@ -34,13 +33,12 @@ class Login(BaseTestCase):
         response = self.client.get("/login")
         assert response.status=="400 BAD REQUEST"
 
-
     def test_get_at_login_endpoint_with_poor_spelling(self):
         #Testing the login end point
         #If the method is a GET Method Should  be allowed and receive a positive status code
         response = self.client.get("/Login")
         assert response.status=="404 NOT FOUND"
-    
+        
     def test_get_at_login_endpoint_with_user_details_who_is_not_registered(self):  
         #Testing the login end point with user credential
 

@@ -82,7 +82,6 @@ class Category(BaseTestCase):
             content_type='application/json', 
             data=json.dumps(self.category)
             )
-        
         response = self.client.get(
             "/category/1",
             headers = self.headers, 

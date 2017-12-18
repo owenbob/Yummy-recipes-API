@@ -71,7 +71,6 @@ class Register(BaseTestCase):
             )
         assert response.status=="400 BAD REQUEST"
 
-
     def test_post_register_endpoint_with_poor_spelling(self):
         #Testing the register end point if method is get but endpoint spelt poorly
         self.user={
