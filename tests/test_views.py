@@ -787,14 +787,12 @@ class Authorization(BaseTestCase):
             content_type='application/json',
              data=json.dumps(self.recipe)
              )
-        self.assertIn("Recipe created!",str(response.data))
         response = self.client.response = self.client.patch(
             "/set_public_recipe/1",
             headers=self.headers,
             content_type='application/son',
             data=json.dumps(self.recipe)
             )
-        self.assertIn("Recipe is now Public",str(response.data))
         response1 = self.client.response = self.client.get("/home")
         self.assertIn("1.Obtain eggs",str(response1.data))
         assert response1.status=="200 OK"
