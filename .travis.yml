@@ -24,7 +24,7 @@ before_script:
   - sudo -u postgres createuser yummyrecipes
   - sudo -u postgres createdb yummy_recipes
   - sudo -u postgres createdb test
-  - python manager.py db init || 0
+  - python manager.py db init || exit 0
   - python manager.py db migrate
   - python manager.py db upgrade
 
