@@ -1,4 +1,5 @@
 from flask import request,jsonify,make_response
+from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from validate_email import validate_email
@@ -16,6 +17,7 @@ from API.models import db
 
 #Route for registering a user.This route takes the users details and assigns them a unique id 
 @app.route("/register",methods=["POST"])
+@cross_origin()
 def create_user():
     
     if not request.json:
@@ -118,6 +120,7 @@ def token_needed(f):
 
   #Route to login and generate token   
 @app.route("/login",methods=["POST","GET"])
+@cross_origin()
 def login():
     #Obtain user details in Json Format
     auth = request.get_json()
@@ -146,6 +149,7 @@ def login():
 
 #Endpoint to create category
 @app.route("/create_category", methods=["POST"])
+@cross_origin()
 @token_needed
 def create_category(current_user):
     if not request.json:
@@ -201,6 +205,7 @@ def create_category(current_user):
         
 #Route to get all categories
 @app.route("/categories", methods=["GET"])
+@cross_origin()
 @token_needed
 def get_all_categories(current_user):
     output = []
@@ -210,7 +215,12 @@ def get_all_categories(current_user):
 
     # If statement to  search categories by name
     if search:
-        search_categories = Category.query.filter(Category.category_title.ilike('%' + search + '%'))
+        search_categories_num = Category.query.filter(Category.category_title.ilike('%' + search + '%'))
+        search_categories = Category.query.filter(Category.category_title.ilike('%' + search + '%'), Category.email == current_user.email).paginate(page, limit, False).items
+        count = 0
+        for category in search_categories_num:
+            count=count+1
+            
         if search_categories:
             for category in search_categories:
                 category_data = {}
@@ -218,6 +228,7 @@ def get_all_categories(current_user):
                 category_data["category_title"] = category.category_title
                 category_data["category_description"] = category.category_description
                 category_data["Category_date_stamp"] = category.category_date_stamp
+                category_data["count"] = count
                 output.append(category_data)
 
             return jsonify({
@@ -227,6 +238,7 @@ def get_all_categories(current_user):
      
     #If statement to handle pagination 
     if limit:
+        categories = Category.query.filter_by(email=current_user.email).all()
         paginate_categories = Category.query.filter_by(email=current_user.email).paginate(page, limit, False).items
         if paginate_categories:
             for category in paginate_categories:
@@ -235,8 +247,8 @@ def get_all_categories(current_user):
                 category_data["category_title"] = category.category_title
                 category_data["category_description"] = category.category_description
                 category_data["Category_date_stamp"] = category.category_date_stamp
+                category_data["count"] = len(categories)
                 output.append(category_data)
-
             return jsonify({
                 "Status":"Success",
                 "Categories" : output
@@ -246,6 +258,7 @@ def get_all_categories(current_user):
                 "Status":"Fail",
                 "Message" : " 404-Page Not Found"
                 }),404
+    
                 
     #statement to handle return of all categories        
     else:
@@ -265,6 +278,7 @@ def get_all_categories(current_user):
 
 #Returning one category by its  category id
 @app.route("/category/<category_id>", methods=["GET"])
+@cross_origin()
 @token_needed
 def get_one_category(current_user, category_id):
     category= Category.query.filter_by(category_id=category_id, email=current_user.email).first()
@@ -285,6 +299,7 @@ def get_one_category(current_user, category_id):
 
 #Endpoint to edit a category ie new category title and category description
 @app.route("/edit_category/<category_id>", methods=["PUT"])
+@cross_origin()
 @token_needed
 def edit_category(current_user, category_id):
     category = Category.query.filter_by(category_id=category_id, email=current_user.email).first()
@@ -329,6 +344,7 @@ def edit_category(current_user, category_id):
 
 #Delete endpoint
 @app.route("/delete_category/<category_id>", methods=["DELETE"])
+@cross_origin()
 @token_needed
 def delete_category(current_user, category_id):
     category = Category.query.filter_by(category_id=category_id, email=current_user.email).first()
@@ -349,6 +365,7 @@ def delete_category(current_user, category_id):
 
 #Endpoint to create recipes using a valid category id
 @app.route("/create_recipe/<category_id>", methods=["POST"])
+@cross_origin()
 @token_needed
 def create_recipe(current_user,category_id):
 
@@ -404,15 +421,22 @@ def create_recipe(current_user,category_id):
 
 #Route to get all Recipes
 @app.route("/recipes", methods=["GET"])
+@cross_origin()
 @token_needed
 def get_all_recipes(current_user):
     output = []
     search = request.args.get("q")
     limit = request.args.get('limit', None, type=int)
     page = request.args.get('page', 1, type=int)
+
     #Searching for a recipe using the recipe name
-    if search:
-        search_recipes = Recipe.query.filter(Recipe.recipe_title.ilike('%' + search + '%'))
+    if search and limit and page:
+        search_recipes_num = Recipe.query.filter(Recipe.recipe_title.ilike('%' + search + '%'))
+        search_recipes = Recipe.query.filter(Recipe.recipe_title.ilike('%' + search + '%'),Recipe.email == current_user.email).paginate(page, limit, False).items
+
+        count = 0
+        for recipe in search_recipes_num:
+            count = count + 1
         if search_recipes:
             for recipe in search_recipes:
                 category = Category.query.filter_by(category_id=recipe.category_id, email=current_user.email).first()
@@ -426,17 +450,19 @@ def get_all_recipes(current_user):
                 recipe_data["recipe_description"] = recipe.recipe_description
                 recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
                 recipe_data ["recipe_public_status"] = recipe.recipe_public_status
+                recipe_data["count"] = count
                 output.append(recipe_data)
 
-            return jsonify({
-                "Status":"Success",
-                "Recipes" : output
-                }),200
+            return make_response(jsonify({
+                "status":"Success",
+                "recipes" : output
+                }),200)
 
     #If statement to handle pagination 
     if limit:
+        recipes = Recipe.query.filter_by(email=current_user.email).all()
         paginate_recipes = Recipe.query.filter_by(email=current_user.email).paginate(page, limit, False).items
-        if pagoinate_recipes:
+        if paginate_recipes:
             for recipe in paginate_recipes:
                 category = Category.query.filter_by(category_id=recipe.category_id, email=current_user.email).first()
                 recipe_data = {}
@@ -449,18 +475,19 @@ def get_all_recipes(current_user):
                 recipe_data["recipe_description"] = recipe.recipe_description
                 recipe_data["recipe_date_stamp"] = recipe.recipe_date_stamp
                 recipe_data ["recipe_public_status"] = recipe.recipe_public_status
-                output.append(recipe_data)
+                recipe_data["count"] = len(recipes)
                 output.append(recipe_data)
 
             return jsonify({
                 "Status":"Success",
-                "Recipes" : output
+                "recipes" : output
                 }),200
         else:
             return jsonify({
                 "Status":"Success",
                 "Messages" : "404-Page Not Found"
                 }),404
+    
     #Statement to get all recipes          
     else:
         recipes = Recipe.query.filter_by(email=current_user.email).all()
@@ -479,13 +506,14 @@ def get_all_recipes(current_user):
             recipe_data ["recipe_public_status"] = recipe.recipe_public_status
             output.append(recipe_data)
 
-        return jsonify({
-            "Status":"Success",
-            "Recipes" : output
-            }),200
+        return make_response(jsonify({
+            "status":"Success",
+            "recipes" : output
+            }),200)
 
 #Obtaing a reciep by recipe id
 @app.route("/recipe/<recipe_id>", methods=["GET"])
+@cross_origin()
 @token_needed
 def get_one_recipe(current_user, recipe_id):
     #Checking to see if its a recipe and is in the database
@@ -513,6 +541,7 @@ def get_one_recipe(current_user, recipe_id):
 
 #Endpoint to edit recipe using a specific id
 @app.route("/edit_recipe/<recipe_id>", methods=["PUT"])
+@cross_origin()
 @token_needed
 def edit_recipe(current_user, recipe_id):
     #Checking to see if its a recipe and is in the database
@@ -572,6 +601,7 @@ def set_public_recipe(current_user,recipe_id):
 
 #route to delete recipe from database 
 @app.route("/delete_recipe/<recipe_id>", methods=["DELETE"])
+@cross_origin()
 @token_needed
 def delete_recipe(current_user, recipe_id):
     #Querying the database to see if the recipe exists 
