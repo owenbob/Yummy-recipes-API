@@ -65,9 +65,16 @@ machine:
   python:
     version: 3.6.3
 
-database:
-  override:
-    - postgres -u ubuntu circle_test 
+  environment:
+    TEST_DB: postgresql://yummyrecipes:admin@localhost:5432/test
+    SECRET_KEY: "********"
+    POSTGRES_USER: yummyrecipes
+    POSTGRES_DB: test
+    POSTGRES_PASSWORD: admin
+
+  
+
+
 
 deployment:
   production:
