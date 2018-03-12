@@ -3,25 +3,25 @@
 # #
 # # Check https://circleci.com/docs/2.0/language-python/ for more details
 # #
-version: 2
-jobs:
-  build:
-    docker:
+# version: 2
+# jobs:
+#   build:
+#     docker:
 
-      - image: circleci/python:3.6.1
-        environment:
-          TEST_DB: postgresql://yummyrecipes:admin@localhost:5432/test
+#       - image: circleci/python:3.6.1
+#         environment:
+#           TEST_DB: postgresql://yummyrecipes:admin@localhost:5432/test
              
-      - image: circleci/postgres:9.6.6
-        environment:
-          SECRET_KEY: "********"
-          POSTGRES_USER: yummyrecipes
-          POSTGRES_DB: test
-          POSTGRES_PASSWORD: admin
+#       - image: circleci/postgres:9.6.6
+#         environment:
+#           SECRET_KEY: "********"
+#           POSTGRES_USER: yummyrecipes
+#           POSTGRES_DB: test
+#           POSTGRES_PASSWORD: admin
 
           
 
-    working_directory: ~/Yummy-recipes-API
+#     working_directory: ~/Yummy-recipes-API
 
 #     steps:
 #       - checkout
@@ -59,7 +59,16 @@ jobs:
 #       - store_artifacts:
 #           path: test-reports
 #           destination: test-reports
-          
+
+
+machine:
+  python:
+    version: 3.6.3
+
+database:
+  override:
+    - postgres -u ubuntu circle_test < my-database-setup.sql
+
 deployment:
   production:
     branch: master
