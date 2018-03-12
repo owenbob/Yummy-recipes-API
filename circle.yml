@@ -66,11 +66,11 @@ machine:
     version: 3.6.3
 
   environment:
-    DATABASE_URL: postgresql://yummyrecipes:admin@localhost:5432/test
+    DATABASE_URL: postgresql://postgres@localhost:5432/test
     SECRET_KEY: "********"
-    POSTGRES_USER: yummyrecipes
+    POSTGRES_USER: postgres
     POSTGRES_DB: test
-    POSTGRES_PASSWORD: admin
+    # POSTGRES_PASSWORD: admin
 
   
 deployment:
