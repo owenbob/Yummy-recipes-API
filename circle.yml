@@ -63,21 +63,11 @@
 
 machine:
   python:
-    version: 3.6.1
+    version: 3.6.3
 
 database:
-  docker:
-      - image: circleci/python:3.6.1
-        environment:
-          TEST_DB: postgresql://yummyrecipes:admin@localhost:5432/test
-             
-      - image: circleci/postgres:9.6.6
-        environment:
-          SECRET_KEY: "********"
-          POSTGRES_USER: yummyrecipes
-          POSTGRES_DB: test
-          POSTGRES_PASSWORD: admin
-
+  override:
+    - postgres -u ubuntu circle_test 
 
 deployment:
   production:
