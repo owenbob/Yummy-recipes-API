@@ -1,35 +1,35 @@
-language: python
-python:
-  - "3.6"
-branches:
-    only:
-        - master
-services:
-  - postgresql
+# language: python
+# python:
+#   - "3.6"
+# branches:
+#     only:
+#         - master
+# services:
+#   - postgresql
 
-# command to install dependencies
-install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-  - pip install coverage
+# # command to install dependencies
+# install:
+#   - pip install -r requirements.txt
+#   - pip install coveralls
+#   - pip install coverage
 
-env:
-  global:
-    - export SECRET_KEY="********"
-    - export DATABASE_URL="postgresql://yummyrecipes:admin@localhost:5432/yummy_recipes"
-    - export TEST_DB="postgresql://yummyrecipes:admin@localhost:5432/test"
+# env:
+#   global:
+#     - export SECRET_KEY="********"
+#     - export DATABASE_URL="postgresql://yummyrecipes:admin@localhost:5432/yummy_recipes"
+#     - export TEST_DB="postgresql://yummyrecipes:admin@localhost:5432/test"
 
 
-before_script:
-  - sudo -u postgres createuser yummyrecipes
-  - sudo -u postgres createdb yummy_recipes
-  - sudo -u postgres createdb test
-  - python manager.py db init || exit 0
-  - python manager.py db migrate
-  - python manager.py db upgrade
+# before_script:
+#   - sudo -u postgres createuser yummyrecipes
+#   - sudo -u postgres createdb yummy_recipes
+#   - sudo -u postgres createdb test
+#   - python manager.py db init || exit 0
+#   - python manager.py db migrate
+#   - python manager.py db upgrade
 
-# command to run tests
-script:
-    - nosetests --with-coverage --cover-package=API
-after_success:
-  coveralls
+# # command to run tests
+# script:
+#     - nosetests --with-coverage --cover-package=API
+# after_success:
+#   coveralls
