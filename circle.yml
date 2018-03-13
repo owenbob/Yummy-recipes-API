@@ -66,12 +66,14 @@ machine:
     version: 3.6.3
 
   environment:
-    DATABASE_URL: postgresql://postgres@localhost:5432/test
-    SECRET_KEY: "********"
-    POSTGRES_USER: postgres
-    POSTGRES_DB: test
-    # POSTGRES_PASSWORD: admin
+  CIRCLE_ENV: test
+    DATABASE_URL: postgresql://yummyrecipes:admin@localhost:5432/test
 
+database:
+  override:
+    # replace CircleCI's generated database.yml
+    - cp config/database.yml.ci config/database.yml
+    - bundle exec rake db:create db:schema:load
   
 deployment:
   production:
