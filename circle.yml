@@ -70,13 +70,17 @@ machine:
     DATABASE_URL: postgresql://yummyrecipes:admin@localhost:5432/test
     SECRET_KEY: "********"
   
-  before_script:
+  run:
     - sudo -u postgres createuser yummyrecipes
     - sudo -u postgres createdb yummy_recipes
     - sudo -u postgres createdb test
     - python manager.py db init || exit 0
     - python manager.py db migrate
     - python manager.py db upgrade
+
+  test:
+    override:
+      - py.test test_*.py
   
 deployment:
   production:
