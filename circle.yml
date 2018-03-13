@@ -66,7 +66,7 @@ machine:
     version: 3.6.3
 
   environment:
-  CIRCLE_ENV: test
+    CIRCLE_ENV: test
     DATABASE_URL: postgresql://yummyrecipes:admin@localhost:5432/test
 
 database:
