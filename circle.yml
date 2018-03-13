@@ -68,12 +68,15 @@ machine:
   environment:
     CIRCLE_ENV: test
     DATABASE_URL: postgresql://yummyrecipes:admin@localhost:5432/test
-
-database:
-  override:
-    # replace CircleCI's generated database.yml
-    - cp config/database.yml
-    - bundle exec rake db:create db:schema:load
+    SECRET_KEY: "********"
+  
+  before_script:
+    - sudo -u postgres createuser yummyrecipes
+    - sudo -u postgres createdb yummy_recipes
+    - sudo -u postgres createdb test
+    - python manager.py db init || exit 0
+    - python manager.py db migrate
+    - python manager.py db upgrade
   
 deployment:
   production:
