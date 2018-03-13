@@ -1,6 +1,0 @@
-test:
-  database: test
-  username: yummyrecipes
-  password: admin
-  adapter: postgresql
-  host: localhost
