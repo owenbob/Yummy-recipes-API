@@ -81,7 +81,7 @@ jobs:
           command: |  # this command is framework-dependent and may vary
             bash .circleci/setup-heroku.sh
             heroku git:remote -a circle-yummy-api
-            git push --force https://heroku:$ad350c82-032b-4fb8-b46b-c0b8280cb941@git.heroku.com/$circle-yummy-api.git HEAD:refs/heads/master
+            git push --force https://heroku:$HEROKU_API_KEY@git.heroku.com/circle-yummy-api.git HEAD:refs/heads/master
             sleep 5  # sleep for 5 seconds to wait for dynos
             heroku restart
 
