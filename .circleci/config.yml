@@ -91,7 +91,6 @@ workflows:
   build-deploy:
     jobs:
       - build-job
-      - heroku-job
       - deploy-job:  # only deploy when master successfully builds
           requires:
             - build-job
