@@ -89,7 +89,7 @@ workflows:
   build-deploy:
     jobs:
       - build-job
-      - deploy-jobs:  # only deploy when master successfully builds
+      - deploy-job:  # only deploy when master successfully builds
           requires:
             - build-job
           filters:
